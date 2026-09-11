@@ -1,5 +1,9 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { paginationRange } from './queries'
+
+vi.mock('./client', () => ({
+  client: { fetch: vi.fn() },
+}))
 
 describe('paginationRange', () => {
   it('returns [0, pageSize] for the first page', () => {
