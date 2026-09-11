@@ -20,7 +20,28 @@ export const article = defineType({
       title: 'Corpo articolo',
       type: 'array',
       of: [
-        { type: 'block' },
+        {
+          type: 'block',
+          marks: {
+            annotations: [
+              defineField({
+                name: 'link',
+                title: 'Link',
+                type: 'object',
+                fields: [
+                  defineField({
+                    name: 'href',
+                    title: 'URL',
+                    type: 'url',
+                    description: 'Assoluto (https://...) per link esterni, relativo (/articolo/slug) per link interni.',
+                    validation: (rule) =>
+                      rule.required().uri({ allowRelative: true, scheme: ['http', 'https', 'mailto', 'tel'] }),
+                  }),
+                ],
+              }),
+            ],
+          },
+        },
         {
           type: 'image',
           options: { hotspot: true },
