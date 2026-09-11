@@ -564,7 +564,7 @@ git commit -m "feat: add Sanity client, image builder, and shared types"
 
 **Interfaces:**
 - Consumes: `client` from `lib/sanity/client.ts` (Task 4), types from `lib/sanity/types.ts` (Task 4).
-- Produces: `paginationRange(page, pageSize): [number, number]`, `getAllCategories()`, `getFeaturedArticles(limit)`, `getCategoryArticles(categorySlug, start, end)`, `getArticleBySlug(slug)`, `searchArticles(term)` — consumed by pages in Tasks 13–16.
+- Produces: `paginationRange(page, pageSize): [number, number]`, `getAllCategories()`, `getFeaturedArticles(limit)`, `getCategoryArticles(categorySlug, page, pageSize)`, `getArticleBySlug(slug)`, `searchArticles(term)` — consumed by pages in Tasks 13–16.
 
 - [ ] **Step 1: Write the failing test for `paginationRange`**
 
