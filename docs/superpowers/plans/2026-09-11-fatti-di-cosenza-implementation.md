@@ -1153,6 +1153,7 @@ git commit -m "feat: add SearchBox component"
 ### Task 11: `Header` and `Footer` components (TDD)
 
 **Files:**
+- Create: `lib/constants.ts`
 - Create: `components/Header.tsx`
 - Test: `components/Header.test.tsx`
 - Create: `components/Footer.tsx`
@@ -1160,9 +1161,21 @@ git commit -m "feat: add SearchBox component"
 
 **Interfaces:**
 - Consumes: `SearchBox` (Task 10).
-- Produces: `Header()`, `Footer()` — consumed by root layout (Task 12). Both hardcode the 5 fixed categories: `[{ name: 'Cronaca', slug: 'cronaca' }, { name: 'Politica', slug: 'politica' }, { name: 'Cultura', slug: 'cultura' }, { name: 'Sport', slug: 'sport' }, { name: 'Enogastronomia', slug: 'enogastronomia' }]`.
+- Produces: `CATEGORIES` (exported from `lib/constants.ts`) — the 5 fixed categories: `[{ name: 'Cronaca', slug: 'cronaca' }, { name: 'Politica', slug: 'politica' }, { name: 'Cultura', slug: 'cultura' }, { name: 'Sport', slug: 'sport' }, { name: 'Enogastronomia', slug: 'enogastronomia' }]`. `Header()`, `Footer()` both import `CATEGORIES` from `lib/constants.ts` rather than each declaring their own copy — consumed by root layout (Task 12).
 
-- [ ] **Step 1: Write the failing test for `Header`**
+- [ ] **Step 1: Create `lib/constants.ts`**
+
+```ts
+export const CATEGORIES = [
+  { name: 'Cronaca', slug: 'cronaca' },
+  { name: 'Politica', slug: 'politica' },
+  { name: 'Cultura', slug: 'cultura' },
+  { name: 'Sport', slug: 'sport' },
+  { name: 'Enogastronomia', slug: 'enogastronomia' },
+]
+```
+
+- [ ] **Step 2: Write the failing test for `Header`**
 
 ```tsx
 import { describe, it, expect } from 'vitest'
@@ -1191,24 +1204,17 @@ describe('Header', () => {
 })
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [ ] **Step 3: Run test to verify it fails**
 
 Run: `npx vitest run components/Header.test.tsx`
 Expected: FAIL — `Header.tsx` does not exist yet.
 
-- [ ] **Step 3: Create `components/Header.tsx`**
+- [ ] **Step 4: Create `components/Header.tsx`**
 
 ```tsx
 import Link from 'next/link'
+import { CATEGORIES } from '@/lib/constants'
 import { SearchBox } from './SearchBox'
-
-const CATEGORIES = [
-  { name: 'Cronaca', slug: 'cronaca' },
-  { name: 'Politica', slug: 'politica' },
-  { name: 'Cultura', slug: 'cultura' },
-  { name: 'Sport', slug: 'sport' },
-  { name: 'Enogastronomia', slug: 'enogastronomia' },
-]
 
 export function Header() {
   return (
@@ -1229,12 +1235,12 @@ export function Header() {
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [ ] **Step 5: Run test to verify it passes**
 
 Run: `npx vitest run components/Header.test.tsx`
 Expected: PASS (2 tests).
 
-- [ ] **Step 5: Write the failing test for `Footer`**
+- [ ] **Step 6: Write the failing test for `Footer`**
 
 ```tsx
 import { describe, it, expect } from 'vitest'
@@ -1256,23 +1262,16 @@ describe('Footer', () => {
 })
 ```
 
-- [ ] **Step 6: Run test to verify it fails**
+- [ ] **Step 7: Run test to verify it fails**
 
 Run: `npx vitest run components/Footer.test.tsx`
 Expected: FAIL — `Footer.tsx` does not exist yet.
 
-- [ ] **Step 7: Create `components/Footer.tsx`**
+- [ ] **Step 8: Create `components/Footer.tsx`**
 
 ```tsx
 import Link from 'next/link'
-
-const CATEGORIES = [
-  { name: 'Cronaca', slug: 'cronaca' },
-  { name: 'Politica', slug: 'politica' },
-  { name: 'Cultura', slug: 'cultura' },
-  { name: 'Sport', slug: 'sport' },
-  { name: 'Enogastronomia', slug: 'enogastronomia' },
-]
+import { CATEGORIES } from '@/lib/constants'
 
 export function Footer() {
   return (
@@ -1290,15 +1289,15 @@ export function Footer() {
 }
 ```
 
-- [ ] **Step 8: Run test to verify it passes**
+- [ ] **Step 9: Run test to verify it passes**
 
 Run: `npx vitest run components/Footer.test.tsx`
 Expected: PASS (2 tests).
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
-git add components/Header.tsx components/Header.test.tsx components/Footer.tsx components/Footer.test.tsx
+git add lib/constants.ts components/Header.tsx components/Header.test.tsx components/Footer.tsx components/Footer.test.tsx
 git commit -m "feat: add Header and Footer components"
 ```
 
