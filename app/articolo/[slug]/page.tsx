@@ -37,7 +37,10 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
   return (
     <main className="mx-auto max-w-3xl px-6 py-8">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
       <CategoryBadge name={article.category.name} accentColor={article.category.accentColor} />
       <h1 className="mt-4 font-display text-4xl font-bold leading-tight">{article.title}</h1>
       <p className="mt-2 text-sm text-neutral-500">

@@ -1,5 +1,10 @@
+import type { Metadata } from 'next'
 import { searchArticles } from '@/lib/sanity/queries'
 import { ArticleCard } from '@/components/ArticleCard'
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: true },
+}
 
 export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
   const term = searchParams.q?.trim() || ''

@@ -19,7 +19,14 @@ export const article = defineType({
       name: 'body',
       title: 'Corpo articolo',
       type: 'array',
-      of: [{ type: 'block' }, { type: 'image', options: { hotspot: true } }],
+      of: [
+        { type: 'block' },
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [defineField({ name: 'alt', title: 'Testo alternativo', type: 'string' })],
+        },
+      ],
       validation: (rule) => rule.required(),
     }),
     defineField({

@@ -15,6 +15,7 @@ export function PortableTextRenderer({ value }: { value: PortableTextBlock[] }) 
                 alt={imageValue.alt || ''}
                 width={1200}
                 height={675}
+                sizes="(max-width: 768px) 100vw, 768px"
                 className="rounded-lg"
               />
             ),

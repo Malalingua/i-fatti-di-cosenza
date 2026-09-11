@@ -15,6 +15,7 @@ export function Hero({ article }: { article: ArticleSummary }) {
         src={urlForImage(article.coverImage).width(1600).height(900).url()}
         alt={article.title}
         fill
+        sizes="100vw"
         priority
         className="object-cover transition-transform group-hover:scale-105"
       />

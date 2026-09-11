@@ -6,8 +6,9 @@ Sito di notizie su Cosenza (cronaca, politica, cultura, sport, enogastronomia) �
 
 1. `npm install`
 2. Copia `.env.example` in `.env.local` e compila i valori (progetto Sanity da https://www.sanity.io/manage).
-3. `npm run dev` — sito su http://localhost:3000, Studio su http://localhost:3000/studio
-4. `npm test` — esegue i test Vitest
+3. Avvia lo Studio (`npm run dev` e poi vai su `/studio`) e crea 5 documenti categoria con esattamente questi slug: `cronaca`, `politica`, `cultura`, `sport`, `enogastronomia` (nomi: Cronaca, Politica, Cultura, Sport, Enogastronomia) — la navigazione di header e footer è cablata su questi slug e restituirà 404 se non corrispondono.
+4. `npm run dev` — sito su http://localhost:3000, Studio su http://localhost:3000/studio
+5. `npm test` — esegue i test Vitest
 
 ## Deploy su Vercel
 

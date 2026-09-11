@@ -2,11 +2,12 @@ import Link from 'next/link'
 import { getAllCategories, getCategoryArticles, getFeaturedArticles } from '@/lib/sanity/queries'
 import { Hero } from '@/components/Hero'
 import { ArticleCard } from '@/components/ArticleCard'
+import { CATEGORIES } from '@/lib/constants'
 
 export const revalidate = 3600
 
 export default async function HomePage() {
-  const [categories, featured] = await Promise.all([getAllCategories(), getFeaturedArticles(2)])
+  const [categories, featured] = await Promise.all([getAllCategories(), getFeaturedArticles(1)])
 
   const sections = await Promise.all(
     categories.map(async (category) => ({
@@ -14,6 +15,9 @@ export default async function HomePage() {
       articles: await getCategoryArticles(category.slug, 1, 4),
     }))
   )
+
+  const order = CATEGORIES.map((c) => c.slug)
+  sections.sort((a, b) => order.indexOf(a.category.slug) - order.indexOf(b.category.slug))
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
