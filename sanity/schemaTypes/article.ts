@@ -47,6 +47,28 @@ export const article = defineType({
           options: { hotspot: true },
           fields: [defineField({ name: 'alt', title: 'Testo alternativo', type: 'string' })],
         },
+        defineField({
+          name: 'videoEmbed',
+          title: 'Video (link YouTube o Vimeo)',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'url',
+              title: 'URL video',
+              type: 'url',
+              description: 'Incolla il link YouTube o Vimeo del video.',
+              validation: (rule) => rule.required().uri({ scheme: ['http', 'https'] }),
+            }),
+          ],
+          preview: { select: { subtitle: 'url' }, prepare: ({ subtitle }) => ({ title: 'Video', subtitle }) },
+        }),
+        defineField({
+          name: 'videoFile',
+          title: 'Video (file caricato)',
+          type: 'file',
+          options: { accept: 'video/*' },
+          fields: [defineField({ name: 'caption', title: 'Didascalia', type: 'string' })],
+        }),
       ],
       validation: (rule) => rule.required(),
     }),
