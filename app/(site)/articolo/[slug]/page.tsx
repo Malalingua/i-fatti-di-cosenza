@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { getArticleBySlug, getCategoryArticles } from '@/lib/sanity/queries'
 import { urlForImage } from '@/lib/sanity/image'
 import { formatDate } from '@/lib/utils/date'
@@ -46,6 +47,16 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       <p className="mt-2 text-sm text-neutral-500">
         {article.author.name} · <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
       </p>
+      <div className="relative mt-6 aspect-video overflow-hidden rounded-xl">
+        <Image
+          src={urlForImage(article.coverImage).width(1200).height(675).url()}
+          alt={article.title}
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="object-cover"
+        />
+      </div>
       <div className="mt-8">
         <PortableTextRenderer value={article.body} />
       </div>
