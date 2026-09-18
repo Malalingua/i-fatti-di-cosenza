@@ -11,7 +11,7 @@ export function Footer() {
           </Link>
         ))}
       </nav>
-      <p className="mt-4">© {new Date().getFullYear()} I Fatti di Cosenza</p>
+      <p className="mt-4">© {new Date().getFullYear()} Malalingua</p>
     </footer>
   )
 }
