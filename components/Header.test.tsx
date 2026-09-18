@@ -25,4 +25,9 @@ describe('Header', () => {
     render(<Header />)
     expect(screen.getByRole('link', { name: 'I Fatti di Cosenza' })).toHaveAttribute('href', '/')
   })
+
+  it('renders the masthead date for a given date', () => {
+    render(<Header date={new Date('2026-01-01T12:00:00.000Z')} />)
+    expect(screen.getByText('Giovedì 1 gennaio 2026')).toBeInTheDocument()
+  })
 })
