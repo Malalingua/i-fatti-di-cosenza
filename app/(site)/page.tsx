@@ -1,49 +1,41 @@
-import Link from 'next/link'
 import { getAllCategories, getCategoryArticles, getFeaturedArticles } from '@/lib/sanity/queries'
 import { Hero } from '@/components/Hero'
-import { ArticleCard } from '@/components/ArticleCard'
-import { CATEGORIES } from '@/lib/constants'
+import { BriefCard } from '@/components/BriefCard'
+import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 3600
 
 export default async function HomePage() {
   const [categories, featured] = await Promise.all([getAllCategories(), getFeaturedArticles(1)])
 
-  const sections = await Promise.all(
-    categories.map(async (category) => ({
-      category,
-      articles: await getCategoryArticles(category.slug, 1, 4),
-    }))
+  const briefCandidates = await Promise.all(
+    categories
+      .filter((category) => category._id !== featured[0]?.category._id)
+      .map(async (category) => (await getCategoryArticles(category.slug, 1, 1))[0])
   )
 
-  const order = CATEGORIES.map((c) => c.slug)
-  sections.sort((a, b) => order.indexOf(a.category.slug) - order.indexOf(b.category.slug))
+  const briefs: ArticleSummary[] = briefCandidates.filter((article): article is ArticleSummary => Boolean(article))
+
+  const lead = featured[0] ?? briefs.shift()
+
+  if (!lead) {
+    return (
+      <main className="mx-auto max-w-6xl px-6 py-8">
+        <p className="text-neutral-500">Nessun articolo pubblicato.</p>
+      </main>
+    )
+  }
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
-      {featured[0] && (
-        <div className="mb-12">
-          <Hero article={featured[0]} />
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+        <div className="lg:col-span-2 lg:row-span-2">
+          <Hero article={lead} />
         </div>
-      )}
-
-      {sections.map(({ category, articles }) =>
-        articles.length > 0 ? (
-          <section key={category._id} className="mb-12">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-display text-2xl font-bold">{category.name}</h2>
-              <Link href={`/${category.slug}`} className="text-sm font-semibold underline">
-                Vedi tutti
-              </Link>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {articles.map((article) => (
-                <ArticleCard key={article._id} article={article} />
-              ))}
-            </div>
-          </section>
-        ) : null
-      )}
+        {briefs.map((article) => (
+          <BriefCard key={article._id} article={article} />
+        ))}
+      </div>
     </main>
   )
 }
