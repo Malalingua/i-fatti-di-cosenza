@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { CATEGORIES } from '@/lib/constants'
 import { formatMastheadDate } from '@/lib/utils/date'
 import { SearchBox } from './SearchBox'
@@ -11,8 +12,8 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
       </div>
       <div className="flex items-center justify-between px-6 py-4">
         <div>
-          <Link href="/" className="font-display text-2xl font-bold">
-            I Fatti di Cosenza
+          <Link href="/">
+            <Image src="/logo-malalingua.webp" alt="I Fatti di Cosenza" width={200} height={49} className="h-10 w-auto" priority />
           </Link>
           <p className="text-xs uppercase tracking-wide text-neutral-500">Blog satirico dalla calabria</p>
         </div>
