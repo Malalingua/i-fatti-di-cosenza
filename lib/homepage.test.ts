@@ -21,20 +21,32 @@ function makeArticle(id: string, categorySlug: string): ArticleSummary {
 describe('sortCategoriesEditorially', () => {
   it('orders categories to match the fixed editorial order regardless of input order', () => {
     const input = [
-      makeCategory('Sport', 'sport'),
-      makeCategory('Cronaca', 'cronaca'),
-      makeCategory('Enogastronomia', 'enogastronomia'),
-      makeCategory('Politica', 'politica'),
-      makeCategory('Cultura', 'cultura'),
+      makeCategory('Carta canta', 'carta-canta'),
+      makeCategory("L'intervista sincera", 'intervista-sincera'),
+      makeCategory('Come campiamo', 'come-campiamo'),
+      makeCategory('Italiani brava gente', 'italiani-brava-gente'),
+      makeCategory('Poltrone', 'poltrone'),
+      makeCategory('Tribunali e tribolazioni', 'tribunali-e-tribolazioni'),
     ]
     const sorted = sortCategoriesEditorially(input)
-    expect(sorted.map((c) => c.slug)).toEqual(['cronaca', 'politica', 'cultura', 'sport', 'enogastronomia'])
+    expect(sorted.map((c) => c.slug)).toEqual([
+      'intervista-sincera',
+      'poltrone',
+      'tribunali-e-tribolazioni',
+      'come-campiamo',
+      'italiani-brava-gente',
+      'carta-canta',
+    ])
   })
 
   it('sorts a category not in the fixed list last', () => {
-    const input = [makeCategory('Sport', 'sport'), makeCategory('Meteo', 'meteo'), makeCategory('Cronaca', 'cronaca')]
+    const input = [
+      makeCategory('Poltrone', 'poltrone'),
+      makeCategory('Meteo', 'meteo'),
+      makeCategory("L'intervista sincera", 'intervista-sincera'),
+    ]
     const sorted = sortCategoriesEditorially(input)
-    expect(sorted.map((c) => c.slug)).toEqual(['cronaca', 'sport', 'meteo'])
+    expect(sorted.map((c) => c.slug)).toEqual(['intervista-sincera', 'poltrone', 'meteo'])
   })
 })
 

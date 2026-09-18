@@ -1,7 +1,8 @@
 export const CATEGORIES = [
-  { name: 'Cronaca', slug: 'cronaca' },
-  { name: 'Politica', slug: 'politica' },
-  { name: 'Cultura', slug: 'cultura' },
-  { name: 'Sport', slug: 'sport' },
-  { name: 'Enogastronomia', slug: 'enogastronomia' },
+  { name: "L'intervista sincera", slug: 'intervista-sincera' },
+  { name: 'Poltrone', slug: 'poltrone' },
+  { name: 'Tribunali e tribolazioni', slug: 'tribunali-e-tribolazioni' },
+  { name: 'Come campiamo', slug: 'come-campiamo' },
+  { name: 'Italiani brava gente', slug: 'italiani-brava-gente' },
+  { name: 'Carta canta', slug: 'carta-canta' },
 ]

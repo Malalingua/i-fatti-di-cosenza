@@ -10,9 +10,12 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
         {formatMastheadDate(date)}
       </div>
       <div className="flex items-center justify-between px-6 py-4">
-        <Link href="/" className="font-display text-2xl font-bold">
-          I Fatti di Cosenza
-        </Link>
+        <div>
+          <Link href="/" className="font-display text-2xl font-bold">
+            I Fatti di Cosenza
+          </Link>
+          <p className="text-xs uppercase tracking-wide text-neutral-500">Blog satirico dalla calabria</p>
+        </div>
         <nav className="flex gap-6 text-sm font-semibold">
           {CATEGORIES.map((category) => (
             <Link key={category.slug} href={`/${category.slug}`}>

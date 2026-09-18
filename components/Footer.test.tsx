@@ -3,9 +3,16 @@ import { render, screen } from '@testing-library/react'
 import { Footer } from './Footer'
 
 describe('Footer', () => {
-  it('renders a link for each of the 5 fixed categories', () => {
+  it('renders a link for each of the 6 fixed categories', () => {
     render(<Footer />)
-    for (const name of ['Cronaca', 'Politica', 'Cultura', 'Sport', 'Enogastronomia']) {
+    for (const name of [
+      "L'intervista sincera",
+      'Poltrone',
+      'Tribunali e tribolazioni',
+      'Come campiamo',
+      'Italiani brava gente',
+      'Carta canta',
+    ]) {
       expect(screen.getByRole('link', { name })).toBeInTheDocument()
     }
   })

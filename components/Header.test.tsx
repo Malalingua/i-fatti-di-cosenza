@@ -7,14 +7,15 @@ vi.mock('next/navigation', () => ({
 }))
 
 describe('Header', () => {
-  it('renders a link for each of the 5 fixed categories', () => {
+  it('renders a link for each of the 6 fixed categories', () => {
     render(<Header />)
     const expected = [
-      ['Cronaca', '/cronaca'],
-      ['Politica', '/politica'],
-      ['Cultura', '/cultura'],
-      ['Sport', '/sport'],
-      ['Enogastronomia', '/enogastronomia'],
+      ["L'intervista sincera", '/intervista-sincera'],
+      ['Poltrone', '/poltrone'],
+      ['Tribunali e tribolazioni', '/tribunali-e-tribolazioni'],
+      ['Come campiamo', '/come-campiamo'],
+      ['Italiani brava gente', '/italiani-brava-gente'],
+      ['Carta canta', '/carta-canta'],
     ]
     for (const [name, href] of expected) {
       expect(screen.getByRole('link', { name })).toHaveAttribute('href', href)
@@ -24,6 +25,11 @@ describe('Header', () => {
   it('renders the site name linking home', () => {
     render(<Header />)
     expect(screen.getByRole('link', { name: 'I Fatti di Cosenza' })).toHaveAttribute('href', '/')
+  })
+
+  it('renders the satirical tagline', () => {
+    render(<Header />)
+    expect(screen.getByText('Blog satirico dalla calabria')).toBeInTheDocument()
   })
 
   it('renders the masthead date for a given date', () => {
