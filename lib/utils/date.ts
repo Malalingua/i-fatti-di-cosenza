@@ -9,7 +9,12 @@ export function formatDate(isoString: string): string {
 }
 
 export function formatMastheadDate(date: Date): string {
-  const weekday = new Intl.DateTimeFormat('it-IT', { weekday: 'long', timeZone: 'UTC' }).format(date)
-  const capitalizedWeekday = weekday.charAt(0).toUpperCase() + weekday.slice(1)
-  return `${capitalizedWeekday} ${formatDate(date.toISOString())}`
+  const formatted = new Intl.DateTimeFormat('it-IT', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Rome',
+  }).format(date)
+  return formatted.charAt(0).toUpperCase() + formatted.slice(1)
 }

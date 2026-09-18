@@ -1,12 +1,14 @@
 import { getAllCategories, getCategoryArticles, getFeaturedArticles } from '@/lib/sanity/queries'
 import { Hero } from '@/components/Hero'
 import { BriefCard } from '@/components/BriefCard'
+import { sortCategoriesEditorially, selectLead } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 3600
 
 export default async function HomePage() {
-  const [categories, featured] = await Promise.all([getAllCategories(), getFeaturedArticles(1)])
+  const [categoriesRaw, featured] = await Promise.all([getAllCategories(), getFeaturedArticles(1)])
+  const categories = sortCategoriesEditorially(categoriesRaw)
 
   const briefCandidates = await Promise.all(
     categories
@@ -16,7 +18,7 @@ export default async function HomePage() {
 
   const briefs: ArticleSummary[] = briefCandidates.filter((article): article is ArticleSummary => Boolean(article))
 
-  const lead = featured[0] ?? briefs.shift()
+  const { lead, briefs: finalBriefs } = selectLead(featured, briefs)
 
   if (!lead) {
     return (
@@ -32,7 +34,7 @@ export default async function HomePage() {
         <div className="lg:col-span-2 lg:row-span-2">
           <Hero article={lead} />
         </div>
-        {briefs.map((article) => (
+        {finalBriefs.map((article) => (
           <BriefCard key={article._id} article={article} />
         ))}
       </div>

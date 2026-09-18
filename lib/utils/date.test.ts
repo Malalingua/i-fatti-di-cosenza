@@ -15,4 +15,8 @@ describe('formatMastheadDate', () => {
   it('formats a date with a capitalized Italian weekday', () => {
     expect(formatMastheadDate(new Date('2026-01-01T12:00:00.000Z'))).toBe('Giovedì 1 gennaio 2026')
   })
+
+  it('uses the Italian calendar day, not UTC, near local midnight', () => {
+    expect(formatMastheadDate(new Date('2026-01-01T00:30:00+01:00'))).toBe('Giovedì 1 gennaio 2026')
+  })
 })

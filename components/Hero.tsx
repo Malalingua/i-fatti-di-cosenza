@@ -13,7 +13,7 @@ export function Hero({ article }: { article: ArticleSummary }) {
           src={urlForImage(article.coverImage).width(1600).height(1000).url()}
           alt={article.title}
           fill
-          sizes="(max-width: 1024px) 100vw, 66vw"
+          sizes="(max-width: 1024px) 100vw, 725px"
           priority
           className="object-cover transition-transform group-hover:scale-105"
         />
