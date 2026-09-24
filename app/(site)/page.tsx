@@ -8,6 +8,7 @@ import {
 import { Hero } from '@/components/Hero'
 import { BriefCard } from '@/components/BriefCard'
 import { OtherNewsCard } from '@/components/OtherNewsCard'
+import { CosentineTranslator } from '@/components/CosentineTranslator'
 import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
@@ -41,7 +42,7 @@ export default async function HomePage() {
   }
 
   const { top: topBriefs } = splitBriefs(slots, finalBriefs, lead._id)
-  const otherNews = pickOtherNews(latest, [lead, ...topBriefs], 4)
+  const otherNews = pickOtherNews(latest, [lead, ...topBriefs], 3)
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
@@ -60,6 +61,9 @@ export default async function HomePage() {
             {otherNews.map((article) => (
               <OtherNewsCard key={article._id} article={article} />
             ))}
+            <div>
+              <CosentineTranslator />
+            </div>
           </div>
         </section>
       )}
