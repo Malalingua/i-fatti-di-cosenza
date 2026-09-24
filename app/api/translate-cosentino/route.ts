@@ -1,7 +1,9 @@
 import { Anthropic } from '@anthropic-ai/sdk'
 import { type NextRequest, NextResponse } from 'next/server'
 
-const client = new Anthropic()
+const client = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+})
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
