@@ -22,6 +22,14 @@ describe('Header', () => {
     }
   })
 
+  it('renders a mailto link to the journalist', () => {
+    render(<Header />)
+    expect(screen.getByRole('link', { name: "Invia un'email" })).toHaveAttribute(
+      'href',
+      'mailto:santiago.m@libero.it'
+    )
+  })
+
   it('renders the site name linking home', () => {
     render(<Header />)
     expect(screen.getByRole('link', { name: 'I Fatti di Cosenza' })).toHaveAttribute('href', '/')

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { CATEGORIES } from '@/lib/constants'
+import { CATEGORIES, JOURNALIST_EMAIL } from '@/lib/constants'
 
 export function Footer() {
   return (
@@ -10,6 +10,7 @@ export function Footer() {
             {category.name}
           </Link>
         ))}
+        <a href={`mailto:${JOURNALIST_EMAIL}`}>Invia un&apos;email</a>
       </nav>
       <p className="mt-4">© {new Date().getFullYear()} Malalingua</p>
     </footer>

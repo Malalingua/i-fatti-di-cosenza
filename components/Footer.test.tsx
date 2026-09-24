@@ -17,6 +17,14 @@ describe('Footer', () => {
     }
   })
 
+  it('renders a mailto link to the journalist', () => {
+    render(<Footer />)
+    expect(screen.getByRole('link', { name: "Invia un'email" })).toHaveAttribute(
+      'href',
+      'mailto:santiago.m@libero.it'
+    )
+  })
+
   it('renders the current year in the copyright line', () => {
     render(<Footer />)
     expect(screen.getByText(new RegExp(String(new Date().getFullYear())))).toBeInTheDocument()

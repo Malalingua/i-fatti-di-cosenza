@@ -1,3 +1,5 @@
+export const JOURNALIST_EMAIL = 'santiago.m@libero.it'
+
 export const CATEGORIES = [
   { name: "L'intervista sincera", slug: 'intervista-sincera' },
   { name: 'Poltrone & Potere', slug: 'poltrone' },

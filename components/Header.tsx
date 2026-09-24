@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { CATEGORIES } from '@/lib/constants'
+import { CATEGORIES, JOURNALIST_EMAIL } from '@/lib/constants'
 import { formatMastheadDate } from '@/lib/utils/date'
 import { SearchBox } from './SearchBox'
 
@@ -23,6 +23,7 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
               {category.name}
             </Link>
           ))}
+          <a href={`mailto:${JOURNALIST_EMAIL}`}>Invia un&apos;email</a>
         </nav>
         <SearchBox />
       </div>
