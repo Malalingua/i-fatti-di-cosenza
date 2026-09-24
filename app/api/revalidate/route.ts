@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     revalidatePath('/sitemap.xml')
   }
 
-  if (body._type === 'category') {
+  if (body._type === 'category' || body._type === 'homepage') {
     revalidatePath('/')
   }
 

@@ -81,33 +81,33 @@ describe('selectLead', () => {
 })
 
 describe('splitBriefs', () => {
-  const ids = (articles: ArticleSummary[]) => articles.map((a) => a._id)
+  const ids = (articles: (ArticleSummary | null)[]) => articles.map((a) => a?._id ?? null)
 
-  it('puts hand-picked articles in the top box before automatic ones', () => {
-    const picked = [makeArticle('p1', 'poltrone'), makeArticle('p2', 'carta-canta')]
+  it('keeps each chosen article in its own slot position', () => {
+    const slots = [null, makeArticle('p2', 'poltrone'), makeArticle('p3', 'carta-canta'), null]
     const auto = [makeArticle('a1', 'come-campiamo'), makeArticle('a2', 'italiani-brava-gente'), makeArticle('a3', 'tribunali')]
-    const { top, more } = splitBriefs(picked, auto, 'lead')
-    expect(ids(top)).toEqual(['p1', 'p2', 'a1', 'a2'])
+    const { top, more } = splitBriefs(slots, auto, 'lead')
+    expect(ids(top)).toEqual(['a1', 'p2', 'p3', 'a2'])
     expect(ids(more)).toEqual(['a3'])
   })
 
-  it('caps the top box at 4 hand-picked articles', () => {
-    const picked = ['p1', 'p2', 'p3', 'p4', 'p5'].map((id) => makeArticle(id, 'poltrone'))
+  it('uses all 4 chosen articles in order and sends automatic ones below', () => {
+    const slots = ['p1', 'p2', 'p3', 'p4'].map((id) => makeArticle(id, 'x'))
     const auto = [makeArticle('a1', 'come-campiamo')]
-    const { top, more } = splitBriefs(picked, auto, 'lead')
+    const { top, more } = splitBriefs(slots, auto, 'lead')
     expect(ids(top)).toEqual(['p1', 'p2', 'p3', 'p4'])
     expect(ids(more)).toEqual(['a1'])
   })
 
   it('never shows the lead or the same article twice', () => {
-    const picked = [makeArticle('lead', 'poltrone'), makeArticle('p1', 'poltrone')]
-    const auto = [makeArticle('p1', 'poltrone'), makeArticle('lead', 'poltrone'), makeArticle('a1', 'come-campiamo')]
-    const { top, more } = splitBriefs(picked, auto, 'lead')
-    expect(ids(top)).toEqual(['p1', 'a1'])
+    const slots = [makeArticle('lead', 'x'), makeArticle('p1', 'x'), makeArticle('p1', 'x'), null]
+    const auto = [makeArticle('p1', 'x'), makeArticle('lead', 'x'), makeArticle('a1', 'y')]
+    const { top, more } = splitBriefs(slots, auto, 'lead')
+    expect(ids(top)).toEqual(['a1', 'p1', null, null])
     expect(more).toEqual([])
   })
 
-  it('falls back to automatic articles when nothing is hand-picked', () => {
+  it('falls back to automatic articles when no slot is chosen', () => {
     const auto = ['a1', 'a2', 'a3', 'a4', 'a5'].map((id) => makeArticle(id, 'x'))
     const { top, more } = splitBriefs([], auto, 'lead')
     expect(ids(top)).toEqual(['a1', 'a2', 'a3', 'a4'])

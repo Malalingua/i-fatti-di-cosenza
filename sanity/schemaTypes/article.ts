@@ -94,12 +94,5 @@ export const article = defineType({
       validation: (rule) => rule.required(),
     }),
     defineField({ name: 'featured', title: 'In evidenza', type: 'boolean', initialValue: false }),
-    defineField({
-      name: 'topBox',
-      title: 'Nel box in alto a destra',
-      type: 'boolean',
-      description: 'Mostra in homepage accanto all’articolo in evidenza (massimo 4, i più recenti).',
-      initialValue: false,
-    }),
   ],
 })

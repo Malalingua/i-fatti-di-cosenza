@@ -1,4 +1,4 @@
-import { getAllCategories, getCategoryArticles, getFeaturedArticles, getTopBoxArticles } from '@/lib/sanity/queries'
+import { getAllCategories, getCategoryArticles, getFeaturedArticles, getHomepageSlots } from '@/lib/sanity/queries'
 import { Hero } from '@/components/Hero'
 import { BriefCard } from '@/components/BriefCard'
 import { sortCategoriesEditorially, selectLead, splitBriefs } from '@/lib/homepage'
@@ -7,10 +7,10 @@ import type { ArticleSummary } from '@/lib/sanity/types'
 export const revalidate = 3600
 
 export default async function HomePage() {
-  const [categoriesRaw, featured, picked] = await Promise.all([
+  const [categoriesRaw, featured, slots] = await Promise.all([
     getAllCategories(),
     getFeaturedArticles(1),
-    getTopBoxArticles(5),
+    getHomepageSlots(),
   ])
   const categories = sortCategoriesEditorially(categoriesRaw)
 
@@ -32,7 +32,7 @@ export default async function HomePage() {
     )
   }
 
-  const { top: topBriefs, more: moreBriefs } = splitBriefs(picked, finalBriefs, lead._id)
+  const { top: topBriefs, more: moreBriefs } = splitBriefs(slots, finalBriefs, lead._id)
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
@@ -40,9 +40,9 @@ export default async function HomePage() {
         <div className="lg:col-span-2 lg:row-span-2">
           <Hero article={lead} />
         </div>
-        {topBriefs.map((article) => (
-          <BriefCard key={article._id} article={article} />
-        ))}
+        {topBriefs.map((article, i) =>
+          article ? <BriefCard key={article._id} article={article} /> : <div key={`empty-${i}`} className="hidden lg:block" />
+        )}
       </div>
       {moreBriefs.length > 0 && (
         <section className="mt-10">

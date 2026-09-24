@@ -26,19 +26,29 @@ export function selectLead(
 const TOP_BOX_SIZE = 4
 
 export function splitBriefs(
-  picked: ArticleSummary[],
+  slots: (ArticleSummary | null)[],
   automatic: ArticleSummary[],
   leadId: string
-): { top: ArticleSummary[]; more: ArticleSummary[] } {
-  const top: ArticleSummary[] = []
-  const more: ArticleSummary[] = []
+): { top: (ArticleSummary | null)[]; more: ArticleSummary[] } {
   const seen = new Set([leadId])
-
-  const pickedWithoutLead = picked.filter((article) => article._id !== leadId).slice(0, TOP_BOX_SIZE)
-  for (const article of [...pickedWithoutLead, ...automatic]) {
-    if (seen.has(article._id)) continue
-    seen.add(article._id)
-    ;(top.length < TOP_BOX_SIZE ? top : more).push(article)
+  const top: (ArticleSummary | null)[] = []
+  for (let i = 0; i < TOP_BOX_SIZE; i++) {
+    const article = slots[i]
+    if (article && !seen.has(article._id)) {
+      seen.add(article._id)
+      top.push(article)
+    } else {
+      top.push(null)
+    }
   }
-  return { top, more }
+
+  const remaining = automatic.filter((article) => {
+    if (seen.has(article._id)) return false
+    seen.add(article._id)
+    return true
+  })
+  for (let i = 0; i < TOP_BOX_SIZE && remaining.length > 0; i++) {
+    if (!top[i]) top[i] = remaining.shift()!
+  }
+  return { top, more: remaining }
 }

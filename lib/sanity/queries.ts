@@ -18,7 +18,14 @@ const articleSummaryFields = `
 
 export const featuredArticlesQuery = `*[_type == "article" && featured == true] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
 
-export const topBoxArticlesQuery = `*[_type == "article" && topBox == true] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
+export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0]{
+  "slots": [
+    topLeft->{ ${articleSummaryFields} },
+    topRight->{ ${articleSummaryFields} },
+    bottomLeft->{ ${articleSummaryFields} },
+    bottomRight->{ ${articleSummaryFields} }
+  ]
+}`
 
 export const categoryArticlesQuery = `*[_type == "article" && category->slug.current == $categorySlug] | order(publishedAt desc) [$start...$end] { ${articleSummaryFields} }`
 
@@ -36,8 +43,9 @@ export async function getFeaturedArticles(limit: number): Promise<ArticleSummary
   return client.fetch(featuredArticlesQuery, { limit })
 }
 
-export async function getTopBoxArticles(limit: number): Promise<ArticleSummary[]> {
-  return client.fetch(topBoxArticlesQuery, { limit })
+export async function getHomepageSlots(): Promise<(ArticleSummary | null)[]> {
+  const result: { slots: (ArticleSummary | null)[] } | null = await client.fetch(homepageSlotsQuery)
+  return result?.slots ?? []
 }
 
 export async function getCategoryArticles(categorySlug: string, page: number, pageSize: number): Promise<ArticleSummary[]> {
