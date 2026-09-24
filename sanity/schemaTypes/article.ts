@@ -90,9 +90,21 @@ export const article = defineType({
       name: 'publishedAt',
       title: 'Data pubblicazione',
       type: 'datetime',
+      description:
+        'Per programmare l’uscita imposta una data futura e premi Pubblica: l’articolo apparirà sul sito da quell’ora (entro 5 minuti).',
       initialValue: () => new Date().toISOString(),
       validation: (rule) => rule.required(),
     }),
     defineField({ name: 'featured', title: 'In evidenza', type: 'boolean', initialValue: false }),
   ],
+  preview: {
+    select: { title: 'title', media: 'coverImage', publishedAt: 'publishedAt', category: 'category.name' },
+    prepare: ({ title, media, publishedAt, category }) => {
+      const scheduled = publishedAt && new Date(publishedAt) > new Date()
+      const when = publishedAt
+        ? new Date(publishedAt).toLocaleString('it-IT', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Rome' })
+        : ''
+      return { title, media, subtitle: scheduled ? `Programmato per ${when}` : category }
+    },
+  },
 })

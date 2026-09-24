@@ -32,7 +32,7 @@ describe('Header', () => {
 
   it('renders the site name linking home', () => {
     render(<Header />)
-    expect(screen.getByRole('link', { name: 'I Fatti di Cosenza' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: 'Malalingua' })).toHaveAttribute('href', '/')
   })
 
   it('renders the satirical tagline', () => {

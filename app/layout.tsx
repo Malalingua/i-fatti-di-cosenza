@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: { default: 'I Fatti di Cosenza', template: '%s | I Fatti di Cosenza' },
+  title: { default: 'Malalingua', template: '%s | Malalingua' },
   description: 'Blog satirico dalla Calabria: interviste, poltrone, tribunali e tribolazioni.',
 }
 

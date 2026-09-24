@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
+import { itITLocale } from '@sanity/locale-it-it'
 import { schemaTypes } from './sanity/schemaTypes'
 
 const SINGLETON_TYPES = new Set(['homepage'])
@@ -8,7 +9,7 @@ const SINGLETON_ACTIONS = new Set(['publish', 'discardChanges', 'restore'])
 
 export default defineConfig({
   name: 'default',
-  title: 'I Fatti di Cosenza',
+  title: 'Malalingua',
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID!,
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET || 'production',
   basePath: '/studio',
@@ -27,7 +28,11 @@ export default defineConfig({
           ]),
     }),
     visionTool(),
+    itITLocale(),
   ],
+  i18n: {
+    locales: (locales) => locales.filter((locale) => locale.id === 'it-IT'),
+  },
   schema: {
     types: schemaTypes,
     templates: (templates) => templates.filter(({ schemaType }) => !SINGLETON_TYPES.has(schemaType)),

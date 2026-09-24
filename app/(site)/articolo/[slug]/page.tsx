@@ -8,7 +8,7 @@ import { CategoryBadge } from '@/components/CategoryBadge'
 import { ArticleCard } from '@/components/ArticleCard'
 import { PortableTextRenderer } from '@/components/PortableTextRenderer'
 
-export const revalidate = 3600
+export const revalidate = 300
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await getArticleBySlug(params.slug)

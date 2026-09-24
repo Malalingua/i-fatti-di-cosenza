@@ -6,6 +6,8 @@ export function paginationRange(page: number, pageSize: number): [number, number
   return [start, start + pageSize]
 }
 
+const isPublished = `publishedAt <= now()`
+
 const articleSummaryFields = `
   _id,
   title,
@@ -16,24 +18,26 @@ const articleSummaryFields = `
   "category": category->{ _id, name, "slug": slug.current, accentColor }
 `
 
-export const featuredArticlesQuery = `*[_type == "article" && featured == true] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
+export const featuredArticlesQuery = `*[_type == "article" && featured == true && ${isPublished}] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
 
 export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0]{
   "slots": [
-    topLeft->{ ${articleSummaryFields} },
-    topRight->{ ${articleSummaryFields} },
-    bottomLeft->{ ${articleSummaryFields} },
-    bottomRight->{ ${articleSummaryFields} }
+    select(topLeft->publishedAt <= now() => topLeft->{ ${articleSummaryFields} }),
+    select(topRight->publishedAt <= now() => topRight->{ ${articleSummaryFields} }),
+    select(bottomLeft->publishedAt <= now() => bottomLeft->{ ${articleSummaryFields} }),
+    select(bottomRight->publishedAt <= now() => bottomRight->{ ${articleSummaryFields} })
   ]
 }`
 
-export const latestArticlesQuery = `*[_type == "article"] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
+export const latestArticlesQuery = `*[_type == "article" && ${isPublished}] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
 
-export const categoryArticlesQuery = `*[_type == "article" && category->slug.current == $categorySlug] | order(publishedAt desc) [$start...$end] { ${articleSummaryFields} }`
+export const categoryArticlesQuery = `*[_type == "article" && category->slug.current == $categorySlug && ${isPublished}] | order(publishedAt desc) [$start...$end] { ${articleSummaryFields} }`
 
-export const articleBySlugQuery = `*[_type == "article" && slug.current == $slug][0]{ ${articleSummaryFields}, body, "author": author->{ _id, name, photo, bio } }`
+export const articleBySlugQuery = `*[_type == "article" && slug.current == $slug && ${isPublished}][0]{ ${articleSummaryFields}, body, "author": author->{ _id, name, photo, bio } }`
 
-export const searchArticlesQuery = `*[_type == "article" && (title match $term || excerpt match $term)] | order(publishedAt desc) [0...20] { ${articleSummaryFields} }`
+export const searchArticlesQuery = `*[_type == "article" && (title match $term || excerpt match $term) && ${isPublished}] | order(publishedAt desc) [0...20] { ${articleSummaryFields} }`
+
+export const articleSlugsQuery = `*[_type == "article" && ${isPublished}]{ "slug": slug.current, publishedAt }`
 
 export const allCategoriesQuery = `*[_type == "category"] | order(name asc) { _id, name, "slug": slug.current, accentColor }`
 

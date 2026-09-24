@@ -13,7 +13,7 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
       <div className="flex items-center justify-between px-6 py-4">
         <div>
           <Link href="/">
-            <Image src="/logo-malalingua.webp" alt="I Fatti di Cosenza" width={200} height={49} className="h-10 w-auto" priority />
+            <Image src="/logo-malalingua.webp" alt="Malalingua" width={200} height={49} className="h-10 w-auto" priority />
           </Link>
           <p className="text-xs uppercase tracking-wide text-neutral-500">Blog satirico dalla calabria</p>
         </div>

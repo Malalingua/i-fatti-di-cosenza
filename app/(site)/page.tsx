@@ -11,7 +11,7 @@ import { OtherNewsCard } from '@/components/OtherNewsCard'
 import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
-export const revalidate = 3600
+export const revalidate = 300
 
 export default async function HomePage() {
   const [categoriesRaw, featured, slots, latest] = await Promise.all([
