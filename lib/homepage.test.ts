@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortCategoriesEditorially, selectLead, splitBriefs } from './homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews } from './homepage'
 import type { ArticleSummary, Category } from './sanity/types'
 
 function makeCategory(name: string, slug: string): Category {
@@ -86,31 +86,40 @@ describe('splitBriefs', () => {
   it('keeps each chosen article in its own slot position', () => {
     const slots = [null, makeArticle('p2', 'poltrone'), makeArticle('p3', 'carta-canta'), null]
     const auto = [makeArticle('a1', 'come-campiamo'), makeArticle('a2', 'italiani-brava-gente'), makeArticle('a3', 'tribunali')]
-    const { top, more } = splitBriefs(slots, auto, 'lead')
+    const { top } = splitBriefs(slots, auto, 'lead')
     expect(ids(top)).toEqual(['a1', 'p2', 'p3', 'a2'])
-    expect(ids(more)).toEqual(['a3'])
   })
 
-  it('uses all 4 chosen articles in order and sends automatic ones below', () => {
+  it('uses all 4 chosen articles in order', () => {
     const slots = ['p1', 'p2', 'p3', 'p4'].map((id) => makeArticle(id, 'x'))
     const auto = [makeArticle('a1', 'come-campiamo')]
-    const { top, more } = splitBriefs(slots, auto, 'lead')
+    const { top } = splitBriefs(slots, auto, 'lead')
     expect(ids(top)).toEqual(['p1', 'p2', 'p3', 'p4'])
-    expect(ids(more)).toEqual(['a1'])
   })
 
   it('never shows the lead or the same article twice', () => {
     const slots = [makeArticle('lead', 'x'), makeArticle('p1', 'x'), makeArticle('p1', 'x'), null]
     const auto = [makeArticle('p1', 'x'), makeArticle('lead', 'x'), makeArticle('a1', 'y')]
-    const { top, more } = splitBriefs(slots, auto, 'lead')
+    const { top } = splitBriefs(slots, auto, 'lead')
     expect(ids(top)).toEqual(['a1', 'p1', null, null])
-    expect(more).toEqual([])
   })
 
   it('falls back to automatic articles when no slot is chosen', () => {
     const auto = ['a1', 'a2', 'a3', 'a4', 'a5'].map((id) => makeArticle(id, 'x'))
-    const { top, more } = splitBriefs([], auto, 'lead')
+    const { top } = splitBriefs([], auto, 'lead')
     expect(ids(top)).toEqual(['a1', 'a2', 'a3', 'a4'])
-    expect(ids(more)).toEqual(['a5'])
+  })
+})
+
+describe('pickOtherNews', () => {
+  it('returns the latest articles not already shown, up to the limit', () => {
+    const latest = ['lead', 'a1', 'b1', 'b2', 'b3', 'b4', 'b5'].map((id) => makeArticle(id, 'x'))
+    const shown = [makeArticle('lead', 'x'), makeArticle('a1', 'x'), null]
+    expect(pickOtherNews(latest, shown, 4).map((a) => a._id)).toEqual(['b1', 'b2', 'b3', 'b4'])
+  })
+
+  it('returns an empty list when everything is already shown', () => {
+    const latest = [makeArticle('lead', 'x')]
+    expect(pickOtherNews(latest, [makeArticle('lead', 'x')], 4)).toEqual([])
   })
 })

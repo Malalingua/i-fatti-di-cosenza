@@ -29,7 +29,7 @@ export function splitBriefs(
   slots: (ArticleSummary | null)[],
   automatic: ArticleSummary[],
   leadId: string
-): { top: (ArticleSummary | null)[]; more: ArticleSummary[] } {
+): { top: (ArticleSummary | null)[] } {
   const seen = new Set([leadId])
   const top: (ArticleSummary | null)[] = []
   for (let i = 0; i < TOP_BOX_SIZE; i++) {
@@ -50,5 +50,14 @@ export function splitBriefs(
   for (let i = 0; i < TOP_BOX_SIZE && remaining.length > 0; i++) {
     if (!top[i]) top[i] = remaining.shift()!
   }
-  return { top, more: remaining }
+  return { top }
+}
+
+export function pickOtherNews(
+  latest: ArticleSummary[],
+  shown: (ArticleSummary | null)[],
+  limit: number
+): ArticleSummary[] {
+  const shownIds = new Set(shown.map((article) => article?._id))
+  return latest.filter((article) => !shownIds.has(article._id)).slice(0, limit)
 }

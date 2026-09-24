@@ -27,6 +27,8 @@ export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0
   ]
 }`
 
+export const latestArticlesQuery = `*[_type == "article"] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
+
 export const categoryArticlesQuery = `*[_type == "article" && category->slug.current == $categorySlug] | order(publishedAt desc) [$start...$end] { ${articleSummaryFields} }`
 
 export const articleBySlugQuery = `*[_type == "article" && slug.current == $slug][0]{ ${articleSummaryFields}, body, "author": author->{ _id, name, photo, bio } }`
@@ -46,6 +48,10 @@ export async function getFeaturedArticles(limit: number): Promise<ArticleSummary
 export async function getHomepageSlots(): Promise<(ArticleSummary | null)[]> {
   const result: { slots: (ArticleSummary | null)[] } | null = await client.fetch(homepageSlotsQuery)
   return result?.slots ?? []
+}
+
+export async function getLatestArticles(limit: number): Promise<ArticleSummary[]> {
+  return client.fetch(latestArticlesQuery, { limit })
 }
 
 export async function getCategoryArticles(categorySlug: string, page: number, pageSize: number): Promise<ArticleSummary[]> {

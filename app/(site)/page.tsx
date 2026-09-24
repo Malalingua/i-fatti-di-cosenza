@@ -1,16 +1,24 @@
-import { getAllCategories, getCategoryArticles, getFeaturedArticles, getHomepageSlots } from '@/lib/sanity/queries'
+import {
+  getAllCategories,
+  getCategoryArticles,
+  getFeaturedArticles,
+  getHomepageSlots,
+  getLatestArticles,
+} from '@/lib/sanity/queries'
 import { Hero } from '@/components/Hero'
 import { BriefCard } from '@/components/BriefCard'
-import { sortCategoriesEditorially, selectLead, splitBriefs } from '@/lib/homepage'
+import { OtherNewsCard } from '@/components/OtherNewsCard'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 3600
 
 export default async function HomePage() {
-  const [categoriesRaw, featured, slots] = await Promise.all([
+  const [categoriesRaw, featured, slots, latest] = await Promise.all([
     getAllCategories(),
     getFeaturedArticles(1),
     getHomepageSlots(),
+    getLatestArticles(12),
   ])
   const categories = sortCategoriesEditorially(categoriesRaw)
 
@@ -32,7 +40,8 @@ export default async function HomePage() {
     )
   }
 
-  const { top: topBriefs, more: moreBriefs } = splitBriefs(slots, finalBriefs, lead._id)
+  const { top: topBriefs } = splitBriefs(slots, finalBriefs, lead._id)
+  const otherNews = pickOtherNews(latest, [lead, ...topBriefs], 4)
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
@@ -44,12 +53,12 @@ export default async function HomePage() {
           article ? <BriefCard key={article._id} article={article} /> : <div key={`empty-${i}`} className="hidden lg:block" />
         )}
       </div>
-      {moreBriefs.length > 0 && (
-        <section className="mt-10">
-          <h2 className="border-b border-neutral-200 pb-2 font-display text-xl font-bold">Le altre notizie</h2>
-          <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-3">
-            {moreBriefs.map((article) => (
-              <BriefCard key={article._id} article={article} />
+      {otherNews.length > 0 && (
+        <section className="mt-12 border-t-2 border-neutral-900 pt-4">
+          <h2 className="border-b-2 border-neutral-900 pb-3 font-display text-3xl font-bold">Le altre notizie</h2>
+          <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-neutral-300 lg:[&>*:not(:first-child)]:pl-8">
+            {otherNews.map((article) => (
+              <OtherNewsCard key={article._id} article={article} />
             ))}
           </div>
         </section>
