@@ -28,16 +28,29 @@ export default async function HomePage() {
     )
   }
 
+  const topBriefs = finalBriefs.slice(0, 4)
+  const moreBriefs = finalBriefs.slice(4)
+
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
         <div className="lg:col-span-2 lg:row-span-2">
           <Hero article={lead} />
         </div>
-        {finalBriefs.map((article) => (
+        {topBriefs.map((article) => (
           <BriefCard key={article._id} article={article} />
         ))}
       </div>
+      {moreBriefs.length > 0 && (
+        <section className="mt-10">
+          <h2 className="border-b border-neutral-200 pb-2 font-display text-xl font-bold">Le altre notizie</h2>
+          <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-3">
+            {moreBriefs.map((article) => (
+              <BriefCard key={article._id} article={article} />
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   )
 }
