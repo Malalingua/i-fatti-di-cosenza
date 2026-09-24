@@ -74,7 +74,7 @@ export function CosentineTranslator() {
       {output && (
         <div className="mt-4 rounded-lg border-l-4 border-neutral-900 bg-neutral-100 p-3">
           <p className="text-xs font-semibold uppercase text-neutral-600">Traduzione Cosentina</p>
-          <p className="mt-2 italic text-neutral-800">"{output}"</p>
+          <p className="mt-2 italic text-neutral-800">&quot;{output}&quot;</p>
         </div>
       )}
     </div>
