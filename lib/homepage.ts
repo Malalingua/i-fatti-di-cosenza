@@ -22,3 +22,23 @@ export function selectLead(
   const [firstBrief, ...rest] = briefCandidates
   return { lead: firstBrief, briefs: rest }
 }
+
+const TOP_BOX_SIZE = 4
+
+export function splitBriefs(
+  picked: ArticleSummary[],
+  automatic: ArticleSummary[],
+  leadId: string
+): { top: ArticleSummary[]; more: ArticleSummary[] } {
+  const top: ArticleSummary[] = []
+  const more: ArticleSummary[] = []
+  const seen = new Set([leadId])
+
+  const pickedWithoutLead = picked.filter((article) => article._id !== leadId).slice(0, TOP_BOX_SIZE)
+  for (const article of [...pickedWithoutLead, ...automatic]) {
+    if (seen.has(article._id)) continue
+    seen.add(article._id)
+    ;(top.length < TOP_BOX_SIZE ? top : more).push(article)
+  }
+  return { top, more }
+}

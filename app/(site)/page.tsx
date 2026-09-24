@@ -1,13 +1,17 @@
-import { getAllCategories, getCategoryArticles, getFeaturedArticles } from '@/lib/sanity/queries'
+import { getAllCategories, getCategoryArticles, getFeaturedArticles, getTopBoxArticles } from '@/lib/sanity/queries'
 import { Hero } from '@/components/Hero'
 import { BriefCard } from '@/components/BriefCard'
-import { sortCategoriesEditorially, selectLead } from '@/lib/homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 3600
 
 export default async function HomePage() {
-  const [categoriesRaw, featured] = await Promise.all([getAllCategories(), getFeaturedArticles(1)])
+  const [categoriesRaw, featured, picked] = await Promise.all([
+    getAllCategories(),
+    getFeaturedArticles(1),
+    getTopBoxArticles(5),
+  ])
   const categories = sortCategoriesEditorially(categoriesRaw)
 
   const briefCandidates = await Promise.all(
@@ -28,8 +32,7 @@ export default async function HomePage() {
     )
   }
 
-  const topBriefs = finalBriefs.slice(0, 4)
-  const moreBriefs = finalBriefs.slice(4)
+  const { top: topBriefs, more: moreBriefs } = splitBriefs(picked, finalBriefs, lead._id)
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
