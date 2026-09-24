@@ -25,7 +25,7 @@ describe('sortCategoriesEditorially', () => {
       makeCategory("L'intervista sincera", 'intervista-sincera'),
       makeCategory('Come campiamo', 'come-campiamo'),
       makeCategory('Italiani brava gente', 'italiani-brava-gente'),
-      makeCategory('Poltrone', 'poltrone'),
+      makeCategory('Poltrone & Potere', 'poltrone'),
       makeCategory('Tribunali e tribolazioni', 'tribunali-e-tribolazioni'),
     ]
     const sorted = sortCategoriesEditorially(input)
@@ -41,7 +41,7 @@ describe('sortCategoriesEditorially', () => {
 
   it('sorts a category not in the fixed list last', () => {
     const input = [
-      makeCategory('Poltrone', 'poltrone'),
+      makeCategory('Poltrone & Potere', 'poltrone'),
       makeCategory('Meteo', 'meteo'),
       makeCategory("L'intervista sincera", 'intervista-sincera'),
     ]

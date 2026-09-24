@@ -11,7 +11,7 @@ describe('Header', () => {
     render(<Header />)
     const expected = [
       ["L'intervista sincera", '/intervista-sincera'],
-      ['Poltrone', '/poltrone'],
+      ['Poltrone & Potere', '/poltrone'],
       ['Tribunali e tribolazioni', '/tribunali-e-tribolazioni'],
       ['Come campiamo', '/come-campiamo'],
       ['Italiani brava gente', '/italiani-brava-gente'],

@@ -7,7 +7,7 @@ describe('Footer', () => {
     render(<Footer />)
     for (const name of [
       "L'intervista sincera",
-      'Poltrone',
+      'Poltrone & Potere',
       'Tribunali e tribolazioni',
       'Come campiamo',
       'Italiani brava gente',
