@@ -46,13 +46,21 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
-      {/* Main grid: Featured left (2/3) tall + Secondary right (1/3) split in 2 */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8">
-        <div className="lg:col-span-2 lg:row-span-2">
+      {/* Main grid: Featured (2/3) + Secondary articles (1/6 each) all in same row */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-6 mb-8">
+        <div className="lg:col-span-4">
           <FeaturedArticle article={lead} category={lead.category?.name} />
         </div>
-        {topBriefs[0] && <SecondaryArticle article={topBriefs[0]} category={topBriefs[0].category?.name} />}
-        {topBriefs[1] && <SecondaryArticle article={topBriefs[1]} category={topBriefs[1].category?.name} bgColor="blue" />}
+        {topBriefs[0] && (
+          <div className="lg:col-span-1">
+            <SecondaryArticle article={topBriefs[0]} category={topBriefs[0].category?.name} />
+          </div>
+        )}
+        {topBriefs[1] && (
+          <div className="lg:col-span-1">
+            <SecondaryArticle article={topBriefs[1]} category={topBriefs[1].category?.name} bgColor="blue" />
+          </div>
+        )}
       </div>
 
       {/* Tribulazioni section */}
