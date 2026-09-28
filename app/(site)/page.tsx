@@ -5,8 +5,9 @@ import {
   getHomepageSlots,
   getLatestArticles,
 } from '@/lib/sanity/queries'
-import { Hero } from '@/components/Hero'
-import { BriefCard } from '@/components/BriefCard'
+import { FeaturedArticle } from '@/components/FeaturedArticle'
+import { SecondaryArticle } from '@/components/SecondaryArticle'
+import { SectionDivider } from '@/components/SectionDivider'
 import { OtherNewsCard } from '@/components/OtherNewsCard'
 import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
@@ -45,23 +46,56 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-8">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-        <div className="lg:col-span-2 lg:row-span-2">
-          <Hero article={lead} />
+      {/* Main grid: Featured left (2/3) + Secondary right (1/3) */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8">
+        <div className="lg:col-span-2">
+          <FeaturedArticle article={lead} category={lead.category?.name} />
         </div>
-        {topBriefs.map((article, i) =>
-          article ? <BriefCard key={article._id} article={article} /> : <div key={`empty-${i}`} className="hidden lg:block" />
-        )}
+        <div className="flex flex-col gap-8">
+          {topBriefs[0] && <SecondaryArticle article={topBriefs[0]} category={topBriefs[0].category?.name} />}
+          {topBriefs[1] && <SecondaryArticle article={topBriefs[1]} category={topBriefs[1].category?.name} bgColor="blue" />}
+        </div>
       </div>
-      {otherNews.length > 0 && (
-        <section className="mt-12 border-t-2 border-neutral-900 pt-4">
-          <h2 className="border-b-2 border-neutral-900 pb-3 font-display text-3xl font-bold">Le altre notizie</h2>
-          <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-neutral-300 lg:[&>*:not(:first-child)]:pl-8">
-            {otherNews.map((article) => (
-              <OtherNewsCard key={article._id} article={article} />
+
+      {/* Tribulazioni section */}
+      {topBriefs.length > 2 && (
+        <>
+          <SectionDivider title="Tribulazioni e Tribolazioni" />
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 mb-8">
+            {topBriefs.slice(2, 4).map((article) => (
+              <div key={article._id} className="flex flex-col">
+                <SecondaryArticle article={article} category={article.category?.name} />
+              </div>
             ))}
           </div>
-        </section>
+        </>
+      )}
+
+      {/* Carta Canta section */}
+      {otherNews.length > 0 && (
+        <>
+          <SectionDivider title="Carta Canta" />
+          <div className="mb-8">
+            <SecondaryArticle article={otherNews[0]} category={otherNews[0].category?.name} />
+          </div>
+        </>
+      )}
+
+      {/* Raccolta Indifferenziata section */}
+      {otherNews.length > 1 && (
+        <>
+          <SectionDivider title="Raccolta Indifferenziata" />
+          <div className="grid grid-cols-2 gap-8 mb-8">
+            {otherNews.slice(1, 3).map((article, i) => (
+              <div key={article._id} className="text-center">
+                <div className="text-4xl font-bold text-neutral-400 mb-4">
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+                <h3 className="font-display text-sm font-bold">{article.title}</h3>
+              </div>
+            ))}
+          </div>
+        </>
       )}
     </main>
   )
