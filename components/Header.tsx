@@ -10,7 +10,12 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
       <div className="bg-[#1b3d8f] text-xs text-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-1">
           <span>{formatMastheadDate(date)}</span>
-          <span>Calabria - Italia</span>
+          <div className="flex items-center gap-4">
+            <div className="hidden text-neutral-900 md:block [&_button]:text-white [&_input]:py-0.5 [&_input]:text-xs">
+              <SearchBox />
+            </div>
+            <span>Calabria - Italia</span>
+          </div>
         </div>
       </div>
 
@@ -30,8 +35,8 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
       </div>
 
       <div className="mx-auto mt-4 max-w-6xl px-4">
-        <div className="flex items-center gap-4 border-b-4 border-neutral-800">
-          <nav className="flex flex-1 gap-5 overflow-x-auto whitespace-nowrap py-2 text-sm font-semibold">
+        <div className="border-b-4 border-neutral-800">
+          <nav className="flex gap-x-5 gap-y-1 overflow-x-auto whitespace-nowrap py-2 text-sm font-semibold md:flex-wrap md:justify-center md:overflow-visible">
             {CATEGORIES.map((category) => (
               <Link key={category.slug} href={`/${category.slug}`} className="hover:text-[#d42a1c]">
                 {category.name}
@@ -41,9 +46,6 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
               Invia un&apos;email
             </a>
           </nav>
-          <div className="hidden lg:flex">
-            <SearchBox />
-          </div>
         </div>
       </div>
     </header>

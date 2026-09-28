@@ -25,7 +25,7 @@ export function SearchBox() {
         onChange={(event) => setTerm(event.target.value)}
         placeholder="Cerca notizie..."
         aria-label="Cerca notizie"
-        className="rounded-full border border-neutral-300 px-4 py-1 text-sm"
+        className="w-44 rounded-full border border-neutral-300 px-4 py-1 text-sm"
       />
       <button type="submit" className="text-sm font-semibold">
         Cerca
