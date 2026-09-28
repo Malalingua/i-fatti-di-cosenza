@@ -53,6 +53,27 @@ export function splitBriefs(
   return { top }
 }
 
+// One article per category box: the newest in that category not already shown,
+// falling back to the newest unused article when the category has none.
+export function pickCategoryBoxes(
+  categoryLists: ArticleSummary[][],
+  fallback: ArticleSummary[],
+  excludeIds: string[]
+): (ArticleSummary | undefined)[] {
+  const seen = new Set(excludeIds)
+  const boxes = categoryLists.map((list) => {
+    const article = list.find((candidate) => !seen.has(candidate._id))
+    if (article) seen.add(article._id)
+    return article
+  })
+  return boxes.map((article) => {
+    if (article) return article
+    const substitute = fallback.find((candidate) => !seen.has(candidate._id))
+    if (substitute) seen.add(substitute._id)
+    return substitute
+  })
+}
+
 export function pickOtherNews(
   latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],

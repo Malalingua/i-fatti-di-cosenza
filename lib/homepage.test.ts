@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews } from './homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes } from './homepage'
 import type { ArticleSummary, Category } from './sanity/types'
 
 function makeCategory(name: string, slug: string): Category {
@@ -121,5 +121,26 @@ describe('pickOtherNews', () => {
   it('returns an empty list when everything is already shown', () => {
     const latest = [makeArticle('lead', 'x')]
     expect(pickOtherNews(latest, [makeArticle('lead', 'x')], 4)).toEqual([])
+  })
+})
+
+describe('pickCategoryBoxes', () => {
+  it('picks the newest article of each category, skipping excluded ids', () => {
+    const lead = makeArticle('lead', 'come-campiamo')
+    const cc = makeArticle('cc', 'come-campiamo')
+    const pp = makeArticle('pp', 'poltrone')
+    const boxes = pickCategoryBoxes([[lead, cc], [pp]], [], ['lead'])
+    expect(boxes.map((a) => a?._id)).toEqual(['cc', 'pp'])
+  })
+
+  it('fills an empty category with the newest unused fallback article', () => {
+    const pp = makeArticle('pp', 'poltrone')
+    const other = makeArticle('other', 'carta-canta')
+    const boxes = pickCategoryBoxes([[], [pp]], [pp, other], [])
+    expect(boxes.map((a) => a?._id)).toEqual(['other', 'pp'])
+  })
+
+  it('returns undefined when nothing is left to show', () => {
+    expect(pickCategoryBoxes([[]], [], [])).toEqual([undefined])
   })
 })

@@ -1,110 +1,69 @@
-import {
-  getAllCategories,
-  getCategoryArticles,
-  getFeaturedArticles,
-  getHomepageSlots,
-  getLatestArticles,
-} from '@/lib/sanity/queries'
+import { getCategoryArticles, getFeaturedArticles, getLatestArticles } from '@/lib/sanity/queries'
 import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { SecondaryArticle } from '@/components/SecondaryArticle'
-import { SectionDivider } from '@/components/SectionDivider'
-import { OtherNewsCard } from '@/components/OtherNewsCard'
-import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews } from '@/lib/homepage'
+import { RaccoltaIndifferenziata } from '@/components/RaccoltaIndifferenziata'
+import { Ticker } from '@/components/Ticker'
+import type { SectionColor } from '@/components/SectionBar'
+import { LEAD_SECTION_TITLE } from '@/lib/constants'
+import { pickCategoryBoxes, pickOtherNews } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 300
 
+const BOXES: { slug: string; title: string; color: SectionColor; span: string; layout: 'stacked' | 'side' }[] = [
+  { slug: 'come-campiamo', title: 'Come campiamo', color: 'green', span: '', layout: 'stacked' },
+  { slug: 'poltrone', title: 'Poltrone & potere', color: 'blue', span: '', layout: 'stacked' },
+  { slug: 'carta-canta', title: 'Carta canta', color: 'red', span: 'md:col-span-2', layout: 'side' },
+  { slug: 'tribunali-e-tribolazioni', title: 'Tribunali e tribolazioni', color: 'brown', span: 'md:col-span-2', layout: 'side' },
+]
+
 export default async function HomePage() {
-  const [categoriesRaw, featured, slots, latest] = await Promise.all([
-    getAllCategories(),
+  const [featured, latest, ...categoryLists] = await Promise.all([
     getFeaturedArticles(1),
-    getHomepageSlots(),
     getLatestArticles(12),
+    ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 3)),
   ])
-  const categories = sortCategoriesEditorially(categoriesRaw)
 
-  const briefCandidates = await Promise.all(
-    categories
-      .filter((category) => category._id !== featured[0]?.category._id)
-      .map(async (category) => (await getCategoryArticles(category.slug, 1, 1))[0])
-  )
-
-  const briefs: ArticleSummary[] = briefCandidates.filter((article): article is ArticleSummary => Boolean(article))
-
-  const { lead, briefs: finalBriefs } = selectLead(featured, briefs)
+  const lead = featured[0] ?? latest[0]
 
   if (!lead) {
     return (
-      <main className="mx-auto max-w-6xl px-6 py-8">
+      <main className="mx-auto max-w-6xl px-4 py-8">
         <p className="text-neutral-500">Nessun articolo pubblicato.</p>
       </main>
     )
   }
 
-  const { top: topBriefs } = splitBriefs(slots, finalBriefs, lead._id)
-  const otherNews = pickOtherNews(latest, [lead, ...topBriefs], 4)
+  const boxArticles = pickCategoryBoxes(categoryLists, latest, [lead._id])
+  const raccolta = pickOtherNews(latest, [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))], 2)
+  const tickerArticle = latest[0]
+
+  const renderBox = (index: number) => {
+    const box = BOXES[index]
+    const article = boxArticles[index]
+    if (!article) return null
+    return (
+      <div key={box.slug} className={box.span}>
+        <SecondaryArticle article={article} title={box.title} color={box.color} layout={box.layout} />
+      </div>
+    )
+  }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-8">
-      {/* Main grid: Featured (2/3) + Secondary articles (1/6 each) all in same row */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-6 mb-8">
-        <div className="lg:col-span-4">
-          <FeaturedArticle article={lead} category={lead.category?.name} />
+    <main className="mx-auto max-w-6xl px-4 py-4">
+      {tickerArticle && <Ticker article={tickerArticle} />}
+
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <div className="md:col-span-2">
+          <FeaturedArticle article={lead} title={LEAD_SECTION_TITLE} />
         </div>
-        {topBriefs[0] && (
-          <div className="lg:col-span-1">
-            <SecondaryArticle article={topBriefs[0]} category={topBriefs[0].category?.name} />
-          </div>
-        )}
-        {topBriefs[1] && (
-          <div className="lg:col-span-1">
-            <SecondaryArticle article={topBriefs[1]} category={topBriefs[1].category?.name} bgColor="blue" />
-          </div>
-        )}
+        {renderBox(0)}
+        {renderBox(1)}
+        {renderBox(2)}
+        {renderBox(3)}
       </div>
 
-      {/* Tribulazioni section */}
-      {topBriefs.length > 2 && (
-        <>
-          <SectionDivider title="Tribulazioni e Tribolazioni" />
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 mb-8">
-            {topBriefs.slice(2, 4).map((article) =>
-              article ? (
-                <div key={article._id} className="flex flex-col">
-                  <SecondaryArticle article={article} category={article.category?.name} />
-                </div>
-              ) : null
-            )}
-          </div>
-        </>
-      )}
-
-      {/* Carta Canta section */}
-      {otherNews.length > 0 && (
-        <>
-          <SectionDivider title="Carta Canta" />
-          <div className="mb-8">
-            <SecondaryArticle article={otherNews[0]} category={otherNews[0].category?.name} />
-          </div>
-        </>
-      )}
-
-      {/* Raccolta Indifferenziata section */}
-      {otherNews.length > 1 && (
-        <>
-          <SectionDivider title="Raccolta Indifferenziata" />
-          <div className="grid grid-cols-2 gap-8 mb-8">
-            {otherNews.slice(1, 3).map((article, i) => (
-              <div key={article._id} className="text-center">
-                <div className="text-4xl font-bold text-neutral-400 mb-4">
-                  {String(i + 1).padStart(2, '0')}
-                </div>
-                <h3 className="font-display text-sm font-bold">{article.title}</h3>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
+      {raccolta.length > 0 && <RaccoltaIndifferenziata articles={raccolta} />}
     </main>
   )
 }

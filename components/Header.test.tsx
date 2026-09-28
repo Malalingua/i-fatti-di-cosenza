@@ -37,7 +37,7 @@ describe('Header', () => {
 
   it('renders the satirical tagline', () => {
     render(<Header />)
-    expect(screen.getByText('Blog satirico dalla calabria')).toBeInTheDocument()
+    expect(screen.getByText('Blog dalla Calabria')).toBeInTheDocument()
   })
 
   it('renders the masthead date for a given date', () => {

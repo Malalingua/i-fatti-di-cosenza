@@ -2,40 +2,44 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { urlForImage } from '@/lib/sanity/image'
 import type { ArticleSummary } from '@/lib/sanity/types'
+import { ArticleTitle } from './ArticleTitle'
+import { SectionBar, type SectionColor } from './SectionBar'
 
 interface SecondaryArticleProps {
   article: ArticleSummary
-  category?: string
-  bgColor?: 'white' | 'blue'
+  title: string
+  color: SectionColor
+  layout?: 'stacked' | 'side'
 }
 
-export function SecondaryArticle({ article, category, bgColor = 'white' }: SecondaryArticleProps) {
-  const bgClass = bgColor === 'blue' ? 'bg-blue-800 text-white' : 'bg-white'
-  const tagBgClass = bgColor === 'blue' ? 'bg-blue-900' : 'bg-red-600 text-white'
+export function SecondaryArticle({ article, title, color, layout = 'stacked' }: SecondaryArticleProps) {
+  const side = layout === 'side'
 
   return (
-    <Link href={`/articoli/${article.slug}`}>
-      <div className={`group overflow-hidden h-full flex flex-col ${bgClass} border border-gray-200`}>
+    <section className="flex h-full flex-col border border-neutral-300 bg-white">
+      <SectionBar title={title} color={color} />
+      <Link
+        href={`/articoli/${article.slug}`}
+        className={`group flex flex-1 gap-3 p-2 ${side ? 'flex-col sm:flex-row' : 'flex-col'}`}
+      >
         {article.coverImage && (
-          <div className="relative h-40 w-full overflow-hidden">
+          <div className={`relative shrink-0 overflow-hidden ${side ? 'aspect-[4/3] sm:aspect-auto sm:w-1/2' : 'aspect-[4/3]'}`}>
             <Image
-              src={urlForImage(article.coverImage).width(400).height(300).url()}
+              src={urlForImage(article.coverImage).width(600).height(450).url()}
               alt={article.title}
               fill
-              className="object-cover group-hover:opacity-90 transition-opacity"
+              sizes="(min-width: 1024px) 25vw, 100vw"
+              className="object-cover transition-opacity group-hover:opacity-90"
             />
           </div>
         )}
-        <div className="flex-1 p-4 flex flex-col">
-          {category && (
-            <div className={`mb-2 inline-block ${tagBgClass} px-2 py-1 text-xs font-bold uppercase tracking-wide w-fit`}>
-              {category}
-            </div>
+        <div className="flex-1">
+          <ArticleTitle title={article.title} className={side ? 'text-2xl' : 'text-xl'} />
+          {article.excerpt && (
+            <p className="mt-2 font-display text-sm leading-snug text-neutral-700 line-clamp-5">{article.excerpt}</p>
           )}
-          <h3 className="font-display text-lg font-bold leading-tight mb-2 flex-1">{article.title}</h3>
-          <p className="text-xs line-clamp-2 opacity-75">{article.excerpt}</p>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </section>
   )
 }
