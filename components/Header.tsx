@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import { CATEGORIES, JOURNALIST_EMAIL, SITE_TAGLINE } from '@/lib/constants'
+import { CATEGORIES, JOURNALIST_EMAIL } from '@/lib/constants'
 import { formatMastheadDate } from '@/lib/utils/date'
 import { SearchBox } from './SearchBox'
 
@@ -16,20 +16,17 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
 
       <div className="mx-auto max-w-6xl px-4 pt-4 text-center">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-700">Blog dalla Calabria</p>
-        <Link href="/" className="mt-2 inline-flex items-end justify-center gap-1">
+        <Link href="/" className="mt-1 inline-block">
           <Image
-            src="/logo-malalingua.webp"
+            src="/logo-malalingua-blog.jpg"
             alt="Malalingua"
             width={2000}
-            height={500}
-            className="h-auto w-60 shrink-0 md:w-96"
+            height={686}
+            sizes="(min-width: 768px) 560px, 90vw"
+            className="h-auto w-[90vw] max-w-[560px] mix-blend-multiply"
             priority
           />
-          <span aria-hidden className="mb-2 font-display text-lg font-bold md:mb-4 md:text-2xl">.blog</span>
         </Link>
-        <div className="mx-auto -mt-1 w-fit bg-[#d42a1c] px-8 py-1 font-display text-base font-bold uppercase italic tracking-wide text-white [clip-path:polygon(0_0,100%_0,96%_50%,100%_100%,0_100%,4%_50%)] md:text-xl">
-          {SITE_TAGLINE}
-        </div>
       </div>
 
       <div className="mx-auto mt-4 max-w-6xl px-4">

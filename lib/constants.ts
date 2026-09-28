@@ -10,7 +10,6 @@ export const CATEGORIES = [
 ]
 
 // Masthead and footer copy from the Malalingua template.
-export const SITE_TAGLINE = 'La lingua che non lecca'
 export const LEAD_SECTION_TITLE = 'Malalingua batte dove la risposta duole'
 
 export const ABOUT_TEXT =
