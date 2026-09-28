@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { urlForImage } from '@/lib/sanity/image'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 interface SecondaryArticleProps {
@@ -18,7 +19,7 @@ export function SecondaryArticle({ article, category, bgColor = 'white' }: Secon
         {article.coverImage && (
           <div className="relative h-40 w-full overflow-hidden">
             <Image
-              src={article.coverImage.url}
+              src={urlForImage(article.coverImage).width(400).height(300).url()}
               alt={article.title}
               fill
               className="object-cover group-hover:opacity-90 transition-opacity"

@@ -62,11 +62,13 @@ export default async function HomePage() {
         <>
           <SectionDivider title="Tribulazioni e Tribolazioni" />
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 mb-8">
-            {topBriefs.slice(2, 4).map((article) => (
-              <div key={article._id} className="flex flex-col">
-                <SecondaryArticle article={article} category={article.category?.name} />
-              </div>
-            ))}
+            {topBriefs.slice(2, 4).map((article) =>
+              article ? (
+                <div key={article._id} className="flex flex-col">
+                  <SecondaryArticle article={article} category={article.category?.name} />
+                </div>
+              ) : null
+            )}
           </div>
         </>
       )}

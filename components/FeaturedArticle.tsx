@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { urlForImage } from '@/lib/sanity/image'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 interface FeaturedArticleProps {
@@ -14,7 +15,7 @@ export function FeaturedArticle({ article, category }: FeaturedArticleProps) {
         {article.coverImage && (
           <div className="relative h-72 w-full overflow-hidden">
             <Image
-              src={article.coverImage.url}
+              src={urlForImage(article.coverImage).width(800).height(600).url()}
               alt={article.title}
               fill
               className="object-cover group-hover:opacity-90 transition-opacity"
