@@ -1,4 +1,4 @@
-export const JOURNALIST_EMAIL = 'santiago.m@libero.it'
+export const JOURNALIST_EMAIL = 'malalingua@libero.it'
 
 export const CATEGORIES = [
   { name: "L'intervista sincera", slug: 'intervista-sincera' },
@@ -19,5 +19,5 @@ export const MASTHEAD = {
   editor: 'Michele Santagata',
   address: "via Ernesto d'Ippolito n. 46, Cosenza",
   phone: '0984 845294',
-  email: 'Malalingua@libero.it',
+  email: JOURNALIST_EMAIL,
 }

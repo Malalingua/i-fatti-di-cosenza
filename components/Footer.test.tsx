@@ -21,7 +21,7 @@ describe('Footer', () => {
     render(<Footer />)
     expect(screen.getByRole('link', { name: "Invia un'email" })).toHaveAttribute(
       'href',
-      'mailto:santiago.m@libero.it'
+      'mailto:malalingua@libero.it'
     )
   })
 
