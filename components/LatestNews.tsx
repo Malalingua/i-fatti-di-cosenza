@@ -13,7 +13,7 @@ export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
       <ol className="divide-y divide-neutral-300 border-x border-b border-neutral-300 bg-white">
         {articles.map((article) => (
           <li key={article._id}>
-            <Link href={`/articoli/${article.slug}`} className="group flex gap-4 p-3 hover:bg-neutral-50">
+            <Link href={`/articolo/${article.slug}`} className="group flex gap-4 p-3 hover:bg-neutral-50">
               <div className="w-20 shrink-0 pt-1 text-xs font-semibold text-neutral-500">
                 <time dateTime={article.publishedAt}>{formatNewsTimestamp(article.publishedAt)}</time>
               </div>

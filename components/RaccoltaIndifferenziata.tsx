@@ -24,7 +24,7 @@ export function RaccoltaIndifferenziata({ articles }: { articles: (ArticleSummar
           return (
             <Link
               key={article._id}
-              href={`/articoli/${article.slug}`}
+              href={`/articolo/${article.slug}`}
               className="block border border-neutral-300 bg-white p-4 hover:bg-neutral-50"
             >
               {number}

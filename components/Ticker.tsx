@@ -7,7 +7,7 @@ export function Ticker({ article }: { article: ArticleSummary }) {
       <span className="shrink-0 bg-[#d42a1c] px-2 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
         Malalingua ora
       </span>
-      <Link href={`/articoli/${article.slug}`} className="truncate font-display hover:underline">
+      <Link href={`/articolo/${article.slug}`} className="truncate font-display hover:underline">
         {article.title}
       </Link>
     </div>

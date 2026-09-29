@@ -13,7 +13,7 @@ export function FeaturedArticle({ article, title }: FeaturedArticleProps) {
   return (
     <section className="flex h-full flex-col border border-neutral-300 bg-white">
       <SectionBar title={title} color="red" />
-      <Link href={`/articoli/${article.slug}`} className="group relative block min-h-[26rem] flex-1 overflow-hidden bg-neutral-900">
+      <Link href={`/articolo/${article.slug}`} className="group relative block min-h-[26rem] flex-1 overflow-hidden bg-neutral-900">
         {article.coverImage && (
           <Image
             src={urlForImage(article.coverImage).width(1000).height(1100).url()}

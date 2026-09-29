@@ -19,7 +19,7 @@ export function SecondaryArticle({ article, title, color, layout = 'stacked' }: 
     <section className="flex h-full flex-col border border-neutral-300 bg-white">
       <SectionBar title={title} color={color} />
       <Link
-        href={`/articoli/${article.slug}`}
+        href={`/articolo/${article.slug}`}
         className={`group flex flex-1 gap-3 p-2 ${side ? 'flex-col sm:flex-row' : 'flex-col'}`}
       >
         {article.coverImage && (
