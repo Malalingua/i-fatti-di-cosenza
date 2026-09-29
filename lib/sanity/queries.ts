@@ -22,6 +22,7 @@ const articleSummaryFields = `
 export const featuredArticlesQuery = `*[_type == "article" && featured == true && ${isPublished}] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
 
 export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0]{
+  leadTitle,
   "lead": select(lead->publishedAt <= now() => lead->{ ${articleSummaryFields} }),
   "slots": [
     select(topLeft->publishedAt <= now() => topLeft->{ ${articleSummaryFields} }),
@@ -58,6 +59,7 @@ export async function getFeaturedArticles(limit: number): Promise<ArticleSummary
 }
 
 export interface HomepageSelection {
+  leadTitle: string | null
   lead: ArticleSummary | null
   slots: (ArticleSummary | null)[]
   raccolta: (ArticleSummary | null)[]
@@ -66,6 +68,7 @@ export interface HomepageSelection {
 export async function getHomepageSlots(): Promise<HomepageSelection> {
   const result: Partial<HomepageSelection> | null = await client.fetch(homepageSlotsQuery)
   return {
+    leadTitle: result?.leadTitle?.trim() || null,
     lead: result?.lead ?? null,
     slots: result?.slots ?? [],
     raccolta: result?.raccolta ?? [],

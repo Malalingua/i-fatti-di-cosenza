@@ -113,7 +113,7 @@ export default async function HomePage() {
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className={leadSpan}>
-          <FeaturedArticle article={lead} title={LEAD_SECTION_TITLE} />
+          <FeaturedArticle article={lead} title={homepage.leadTitle ?? LEAD_SECTION_TITLE} />
         </div>
         {renderBox(0)}
         {renderBox(1)}

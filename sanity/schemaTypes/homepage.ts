@@ -36,6 +36,12 @@ export const homepage = defineType({
   ],
   fields: [
     defineField({
+      name: 'leadTitle',
+      title: 'Titolo della barra rossa',
+      description: 'Il titolo sopra l’articolo in evidenza. Se vuoto: “Malalingua batte dove la risposta duole”.',
+      type: 'string',
+    }),
+    defineField({
       name: 'lead',
       title: 'Articolo in evidenza',
       description: 'Il box grande “Malalingua batte dove la risposta duole”. Se vuoto, viene usato l’ultimo articolo pubblicato.',
