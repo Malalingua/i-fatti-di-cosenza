@@ -53,16 +53,28 @@ export function splitBriefs(
   return { top }
 }
 
-// One article per category box: the newest in that category not already shown,
-// falling back to the newest unused article when the category has none.
+// One article per category box. A manual pick from the Homepage document wins
+// when it belongs to the box's category; otherwise the box shows the newest
+// article of that category not already shown, falling back to the newest
+// unused article when the category has none.
 export function pickCategoryBoxes(
   categoryLists: ArticleSummary[][],
   fallback: ArticleSummary[],
-  excludeIds: string[]
+  excludeIds: string[],
+  manual: (ArticleSummary | null)[] = [],
+  boxSlugs: string[] = []
 ): (ArticleSummary | undefined)[] {
   const seen = new Set(excludeIds)
-  const boxes = categoryLists.map((list) => {
-    const article = list.find((candidate) => !seen.has(candidate._id))
+  const picks = categoryLists.map((_, i) => {
+    const article = manual[i]
+    if (!article || seen.has(article._id)) return undefined
+    if (boxSlugs[i] && article.category?.slug !== boxSlugs[i]) return undefined
+    seen.add(article._id)
+    return article
+  })
+  const boxes = picks.map((pick, i) => {
+    if (pick) return pick
+    const article = categoryLists[i].find((candidate) => !seen.has(candidate._id))
     if (article) seen.add(article._id)
     return article
   })

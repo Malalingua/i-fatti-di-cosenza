@@ -95,7 +95,13 @@ export const article = defineType({
       initialValue: () => new Date().toISOString(),
       validation: (rule) => rule.required(),
     }),
-    defineField({ name: 'featured', title: 'In evidenza', type: 'boolean', initialValue: false }),
+    defineField({
+      name: 'featured',
+      title: 'In evidenza',
+      description: 'Usato solo se nel documento Homepage non è scelto l’articolo in evidenza.',
+      type: 'boolean',
+      initialValue: false,
+    }),
   ],
   preview: {
     select: { title: 'title', media: 'coverImage', publishedAt: 'publishedAt', category: 'category.name' },

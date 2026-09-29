@@ -1,4 +1,4 @@
-import { getCategoryArticles, getFeaturedArticles, getLatestArticles } from '@/lib/sanity/queries'
+import { getCategoryArticles, getFeaturedArticles, getHomepageSlots, getLatestArticles } from '@/lib/sanity/queries'
 import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { SecondaryArticle } from '@/components/SecondaryArticle'
 import { RaccoltaIndifferenziata } from '@/components/RaccoltaIndifferenziata'
@@ -19,13 +19,14 @@ const BOXES: { slug: string; title: string; color: SectionColor; span: string; l
 ]
 
 export default async function HomePage() {
-  const [featured, latest, ...categoryLists] = await Promise.all([
+  const [homepage, featured, latest, ...categoryLists] = await Promise.all([
+    getHomepageSlots(),
     getFeaturedArticles(1),
     getLatestArticles(30),
     ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 3)),
   ])
 
-  const lead = featured[0] ?? latest[0]
+  const lead = homepage.lead ?? featured[0] ?? latest[0]
 
   if (!lead) {
     return (
@@ -35,7 +36,13 @@ export default async function HomePage() {
     )
   }
 
-  const boxArticles = pickCategoryBoxes(categoryLists, latest, [lead._id])
+  const boxArticles = pickCategoryBoxes(
+    categoryLists,
+    latest,
+    [lead._id],
+    homepage.slots,
+    BOXES.map((box) => box.slug)
+  )
   const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
   const raccolta = pickOtherNews(latest, shownAbove, 2)
   // Everything not already on the page, newest first: articles pushed out of

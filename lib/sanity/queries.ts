@@ -21,6 +21,7 @@ const articleSummaryFields = `
 export const featuredArticlesQuery = `*[_type == "article" && featured == true && ${isPublished}] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
 
 export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0]{
+  "lead": select(lead->publishedAt <= now() => lead->{ ${articleSummaryFields} }),
   "slots": [
     select(topLeft->publishedAt <= now() => topLeft->{ ${articleSummaryFields} }),
     select(topRight->publishedAt <= now() => topRight->{ ${articleSummaryFields} }),
@@ -49,9 +50,14 @@ export async function getFeaturedArticles(limit: number): Promise<ArticleSummary
   return client.fetch(featuredArticlesQuery, { limit })
 }
 
-export async function getHomepageSlots(): Promise<(ArticleSummary | null)[]> {
-  const result: { slots: (ArticleSummary | null)[] } | null = await client.fetch(homepageSlotsQuery)
-  return result?.slots ?? []
+export interface HomepageSelection {
+  lead: ArticleSummary | null
+  slots: (ArticleSummary | null)[]
+}
+
+export async function getHomepageSlots(): Promise<HomepageSelection> {
+  const result: Partial<HomepageSelection> | null = await client.fetch(homepageSlotsQuery)
+  return { lead: result?.lead ?? null, slots: result?.slots ?? [] }
 }
 
 export async function getLatestArticles(limit: number): Promise<ArticleSummary[]> {
