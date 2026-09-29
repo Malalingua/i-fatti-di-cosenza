@@ -48,33 +48,6 @@ export const homepage = defineType({
     slot('bottomRight', 'Tribunali e tribolazioni (marrone)', 'tribunali-e-tribolazioni'),
     defineField({ name: 'raccolta1', title: '01', type: 'reference', to: [{ type: 'article' }], fieldset: 'raccolta' }),
     defineField({ name: 'raccolta2', title: '02', type: 'reference', to: [{ type: 'article' }], fieldset: 'raccolta' }),
-    defineField({
-      name: 'recentlyRemoved',
-      title: 'Scesi in Ultime notizie',
-      description: 'Si aggiorna da solo quando premi Pubblica: gli articoli tolti dalla homepage finiscono qui e in cima a “Ultime notizie”.',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          name: 'removedArticle',
-          fields: [
-            { name: 'article', title: 'Articolo', type: 'reference', to: [{ type: 'article' }], weak: true },
-            { name: 'removedAt', title: 'Tolto il', type: 'datetime' },
-          ],
-          preview: {
-            select: { title: 'article.title', media: 'article.coverImage', removedAt: 'removedAt' },
-            prepare: ({ title, media, removedAt }: { title?: string; media?: unknown; removedAt?: string }) => ({
-              title: title ?? 'Articolo eliminato',
-              media: media as never,
-              subtitle: removedAt
-                ? `Tolto il ${new Date(removedAt).toLocaleString('it-IT', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Rome' })}`
-                : '',
-            }),
-          },
-        },
-      ],
-      readOnly: true,
-    }),
   ],
   preview: { prepare: () => ({ title: 'Homepage' }) },
 })

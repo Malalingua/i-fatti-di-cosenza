@@ -1,4 +1,11 @@
-import { getCategoryArticles, getFeaturedArticles, getHomepageSlots, getLatestArticles } from '@/lib/sanity/queries'
+import {
+  getArticlesByIds,
+  getCategoryArticles,
+  getFeaturedArticles,
+  getHomepageSlots,
+  getLatestArticles,
+} from '@/lib/sanity/queries'
+import { getHomepageReplacements } from '@/lib/sanity/homepageHistory'
 import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { SecondaryArticle } from '@/components/SecondaryArticle'
 import { RaccoltaIndifferenziata } from '@/components/RaccoltaIndifferenziata'
@@ -19,8 +26,9 @@ const BOXES: { slug: string; title: string; color: SectionColor; layout: 'stacke
 ]
 
 export default async function HomePage() {
-  const [homepage, featured, latest, ...categoryLists] = await Promise.all([
+  const [homepage, replacements, featured, latest, ...categoryLists] = await Promise.all([
     getHomepageSlots(),
+    getHomepageReplacements(),
     getFeaturedArticles(1),
     getLatestArticles(30),
     ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 3)),
@@ -44,7 +52,12 @@ export default async function HomePage() {
   )
   const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
   const raccolta = pickManualOnly(homepage.raccolta, shownAbove, 2)
-  const olderNews = buildLatestFeed(homepage.recentlyRemoved, [...shownAbove, ...raccolta], 20)
+  const replacedArticles = await getArticlesByIds(replacements.map((replacement) => replacement.id))
+  const removed = replacements.flatMap((replacement) => {
+    const article = replacedArticles.find((candidate) => candidate._id === replacement.id)
+    return article ? [{ article, removedAt: replacement.removedAt }] : []
+  })
+  const olderNews = buildLatestFeed(removed, [...shownAbove, ...raccolta], 20)
   const tickerArticle = latest[0]
 
   // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and

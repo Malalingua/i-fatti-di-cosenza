@@ -31,9 +31,10 @@ export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0
   "raccolta": [
     select(raccolta1->publishedAt <= now() => raccolta1->{ ${articleSummaryFields} }),
     select(raccolta2->publishedAt <= now() => raccolta2->{ ${articleSummaryFields} })
-  ],
-  "recentlyRemoved": recentlyRemoved[]{ removedAt, "article": article->{ ${articleSummaryFields} } }
+  ]
 }`
+
+export const articlesByIdsQuery = `*[_type == "article" && _id in $ids && ${isPublished}] { ${articleSummaryFields} }`
 
 export const latestArticlesQuery = `*[_type == "article" && ${isPublished}] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
 
@@ -59,12 +60,6 @@ export interface HomepageSelection {
   lead: ArticleSummary | null
   slots: (ArticleSummary | null)[]
   raccolta: (ArticleSummary | null)[]
-  recentlyRemoved: RemovedArticle[]
-}
-
-export interface RemovedArticle {
-  removedAt: string
-  article: ArticleSummary
 }
 
 export async function getHomepageSlots(): Promise<HomepageSelection> {
@@ -73,11 +68,12 @@ export async function getHomepageSlots(): Promise<HomepageSelection> {
     lead: result?.lead ?? null,
     slots: result?.slots ?? [],
     raccolta: result?.raccolta ?? [],
-    // Deleted (weak) references come back null; scheduled articles stay hidden.
-    recentlyRemoved: ((result?.recentlyRemoved ?? []) as { removedAt: string; article: ArticleSummary | null }[]).filter(
-      (item): item is RemovedArticle => Boolean(item.article) && new Date(item.article!.publishedAt) <= new Date()
-    ),
   }
+}
+
+export async function getArticlesByIds(ids: string[]): Promise<ArticleSummary[]> {
+  if (ids.length === 0) return []
+  return client.fetch(articlesByIdsQuery, { ids })
 }
 
 export async function getLatestArticles(limit: number): Promise<ArticleSummary[]> {
