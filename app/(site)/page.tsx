@@ -3,6 +3,7 @@ import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { SecondaryArticle } from '@/components/SecondaryArticle'
 import { RaccoltaIndifferenziata } from '@/components/RaccoltaIndifferenziata'
 import { Ticker } from '@/components/Ticker'
+import { LatestNews } from '@/components/LatestNews'
 import type { SectionColor } from '@/components/SectionBar'
 import { LEAD_SECTION_TITLE } from '@/lib/constants'
 import { pickCategoryBoxes, pickOtherNews } from '@/lib/homepage'
@@ -20,7 +21,7 @@ const BOXES: { slug: string; title: string; color: SectionColor; span: string; l
 export default async function HomePage() {
   const [featured, latest, ...categoryLists] = await Promise.all([
     getFeaturedArticles(1),
-    getLatestArticles(12),
+    getLatestArticles(30),
     ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 3)),
   ])
 
@@ -35,7 +36,11 @@ export default async function HomePage() {
   }
 
   const boxArticles = pickCategoryBoxes(categoryLists, latest, [lead._id])
-  const raccolta = pickOtherNews(latest, [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))], 2)
+  const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
+  const raccolta = pickOtherNews(latest, shownAbove, 2)
+  // Everything not already on the page, newest first: articles pushed out of
+  // the lead or a box by a newer one drop down here automatically.
+  const olderNews = pickOtherNews(latest, [...shownAbove, ...raccolta], 20)
   const tickerArticle = latest[0]
 
   const renderBox = (index: number) => {
@@ -64,6 +69,8 @@ export default async function HomePage() {
       </div>
 
       {raccolta.length > 0 && <RaccoltaIndifferenziata articles={raccolta} />}
+
+      {olderNews.length > 0 && <LatestNews articles={olderNews} />}
     </main>
   )
 }
