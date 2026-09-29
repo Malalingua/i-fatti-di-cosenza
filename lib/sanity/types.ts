@@ -22,6 +22,7 @@ export interface ArticleSummary {
   excerpt: string
   coverImage: SanityImageSource
   publishedAt: string
+  featured?: boolean
   category: Category
 }
 

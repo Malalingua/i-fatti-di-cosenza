@@ -18,11 +18,6 @@ export interface HomepageVersion {
   doc: HomepageDoc
 }
 
-export interface Replacement {
-  id: string
-  removedAt: string
-}
-
 export function referencedIds(versions: HomepageVersion[]): string[] {
   const ids = new Set<string>()
   for (const { doc } of versions) {
@@ -32,20 +27,6 @@ export function referencedIds(versions: HomepageVersion[]): string[] {
     }
   }
   return [...ids]
-}
-
-// `states` list what the homepage showed, oldest first; the first one is the
-// baseline. An article counts as replaced when it stops being shown; if it
-// comes back and leaves again, the latest removal wins.
-export function replacementsFromShown(states: { time: string; shown: string[] }[]): Replacement[] {
-  const removedAt = new Map<string, string>()
-  for (let i = 1; i < states.length; i++) {
-    const after = new Set(states[i].shown)
-    for (const id of states[i - 1].shown) {
-      if (!after.has(id)) removedAt.set(id, states[i].time)
-    }
-  }
-  return [...removedAt].map(([id, time]) => ({ id, removedAt: time }))
 }
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
@@ -83,7 +64,6 @@ export async function getHomepageVersions(): Promise<HomepageVersion[]> {
     .split('\n')
     .filter((line) => line.trim())
     .map((line) => JSON.parse(line))
-  if (transactions.length === 0) return []
 
   const [baseline, ...versions] = await Promise.all([
     documentAt(`time=${encodeURIComponent(FEED_RESET)}`, true),

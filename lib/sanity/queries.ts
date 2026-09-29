@@ -15,6 +15,7 @@ const articleSummaryFields = `
   excerpt,
   coverImage,
   publishedAt,
+  featured,
   "category": category->{ _id, name, "slug": slug.current, accentColor }
 `
 

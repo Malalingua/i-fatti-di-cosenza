@@ -6,11 +6,11 @@ import {
   getLatestArticles,
 } from '@/lib/sanity/queries'
 import {
+  FEED_RESET,
   HOMEPAGE_RACCOLTA_FIELDS,
   HOMEPAGE_SLOT_FIELDS,
   getHomepageVersions,
   referencedIds,
-  replacementsFromShown,
 } from '@/lib/sanity/homepageHistory'
 import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { SecondaryArticle } from '@/components/SecondaryArticle'
@@ -19,7 +19,13 @@ import { Ticker } from '@/components/Ticker'
 import { LatestNews } from '@/components/LatestNews'
 import type { SectionColor } from '@/components/SectionBar'
 import { LEAD_SECTION_TITLE } from '@/lib/constants'
-import { buildLatestFeed, selectHomepage, shownArticles, type HomepageSources } from '@/lib/homepage'
+import {
+  buildLatestFeed,
+  replacementsOverTime,
+  selectHomepage,
+  shownArticles,
+  type HomepageSources,
+} from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 60
@@ -35,9 +41,9 @@ export default async function HomePage() {
   const [homepage, versions, featured, latest, ...categoryLists] = await Promise.all([
     getHomepageSlots(),
     getHomepageVersions(),
-    getFeaturedArticles(1),
+    getFeaturedArticles(10),
     getLatestArticles(30),
-    ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 3)),
+    ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 10)),
   ])
 
   const sources: HomepageSources = { featured, latest, categoryLists, boxSlugs: BOXES.map((box) => box.slug) }
@@ -53,26 +59,24 @@ export default async function HomePage() {
 
   const { lead, boxes: boxArticles, raccolta } = layout
 
-  // "Ultime notizie": work out what each past Homepage version showed (with
-  // today's automatic choices) and list the articles that dropped out.
-  const historyArticles = new Map(
-    (await getArticlesByIds(referencedIds(versions))).map((article) => [article._id, article])
-  )
-  const resolve = (ref: { _ref?: string } | undefined) => (ref?._ref && historyArticles.get(ref._ref)) || null
-  const replacements = replacementsFromShown(
+  // "Ultime notizie": replay the homepage since the reset (every Homepage
+  // publish and every article publish) and list the articles that dropped out.
+  const historyArticles = await getArticlesByIds(referencedIds(versions))
+  const byId = new Map(historyArticles.map((article) => [article._id, article]))
+  const resolve = (ref: { _ref?: string } | undefined) => (ref?._ref && byId.get(ref._ref)) || null
+  const pool = [...latest, ...featured, ...categoryLists.flat(), ...historyArticles]
+  const replacements = replacementsOverTime(
     versions.map(({ time, doc }) => ({
       time,
-      shown: shownArticles(
-        selectHomepage(
-          {
-            lead: resolve(doc?.lead),
-            slots: HOMEPAGE_SLOT_FIELDS.map((field) => resolve(doc?.[field])),
-            raccolta: HOMEPAGE_RACCOLTA_FIELDS.map((field) => resolve(doc?.[field])),
-          },
-          sources
-        )
-      ).map((article) => article._id),
-    }))
+      picks: {
+        lead: resolve(doc?.lead),
+        slots: HOMEPAGE_SLOT_FIELDS.map((field) => resolve(doc?.[field])),
+        raccolta: HOMEPAGE_RACCOLTA_FIELDS.map((field) => resolve(doc?.[field])),
+      },
+    })),
+    pool,
+    sources.boxSlugs,
+    FEED_RESET
   )
   const replacedArticles = await getArticlesByIds(replacements.map((replacement) => replacement.id))
   const removed = replacements.flatMap((replacement) => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickManualOnly, buildLatestFeed, selectHomepage, shownArticles } from './homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickManualOnly, buildLatestFeed, selectHomepage, shownArticles, replacementsOverTime } from './homepage'
 import type { ArticleSummary, Category } from './sanity/types'
 
 function makeCategory(name: string, slug: string): Category {
@@ -230,5 +230,46 @@ describe('selectHomepage', () => {
     const auto = makeArticle('auto', 'poltrone')
     const layout = selectHomepage({ lead, slots: [null], raccolta: [] }, sources({ categoryLists: [[auto]] }))
     expect(shownArticles(layout).map((a) => a._id)).toEqual(['lead', 'auto'])
+  })
+})
+
+describe('replacementsOverTime', () => {
+  const SINCE = '2026-09-29T18:00:00.000Z'
+  const art = (id: string, category: string, publishedAt: string, featured = false): ArticleSummary => ({
+    ...makeArticle(id, category),
+    publishedAt,
+    featured,
+  })
+  const noPicks = { lead: null, slots: [], raccolta: [] }
+
+  it('records the old lead when a newer article is flagged "In evidenza"', () => {
+    const scuola = art('scuola', 'carta-canta', '2026-09-24T16:45:00.000Z', true)
+    const giudice = art('giudice', 'tribunali-e-tribolazioni', '2026-09-29T18:25:00.000Z', true)
+    const result = replacementsOverTime([{ time: SINCE, picks: noPicks }], [scuola, giudice], [], SINCE)
+    expect(result).toEqual([{ id: 'scuola', removedAt: '2026-09-29T18:25:00.000Z' }])
+  })
+
+  it('records an article replaced by hand in a box at the Homepage publish time', () => {
+    const lead = art('lead', 'carta-canta', '2026-09-20T10:00:00.000Z', true)
+    const rossi = art('rossi', 'poltrone', '2026-09-21T10:00:00.000Z')
+    const prezzi = art('prezzi', 'poltrone', '2026-09-22T10:00:00.000Z')
+    const versions = [
+      { time: SINCE, picks: { lead: null, slots: [rossi], raccolta: [] } },
+      { time: '2026-09-29T18:11:00.000Z', picks: { lead: null, slots: [prezzi], raccolta: [] } },
+    ]
+    const result = replacementsOverTime(versions, [lead, rossi, prezzi], ['poltrone'], SINCE)
+    expect(result).toEqual([{ id: 'rossi', removedAt: '2026-09-29T18:11:00.000Z' }])
+  })
+
+  it('records an automatic box article pushed out by a newer one in its category', () => {
+    const lead = art('lead', 'carta-canta', '2026-09-20T10:00:00.000Z', true)
+    const older = art('older', 'poltrone', '2026-09-21T10:00:00.000Z')
+    const newer = art('newer', 'poltrone', '2026-09-29T19:00:00.000Z')
+    const result = replacementsOverTime([{ time: SINCE, picks: noPicks }], [lead, older, newer], ['poltrone'], SINCE)
+    expect(result).toEqual([{ id: 'older', removedAt: '2026-09-29T19:00:00.000Z' }])
+  })
+
+  it('returns nothing without history', () => {
+    expect(replacementsOverTime([], [], [], SINCE)).toEqual([])
   })
 })

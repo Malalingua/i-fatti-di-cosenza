@@ -152,6 +152,68 @@ export function shownArticles(layout: HomepageLayout | null): ArticleSummary[] {
   )
 }
 
+// The homepage inputs as they were at `time`: only articles already published
+// then (flags and categories are taken as they are now).
+export function sourcesAt(pool: ArticleSummary[], boxSlugs: string[], time: string): HomepageSources {
+  const at = new Date(time).getTime()
+  const byId = new Map(pool.map((article) => [article._id, article]))
+  const live = [...byId.values()]
+    .filter((article) => new Date(article.publishedAt).getTime() <= at)
+    .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+  return {
+    featured: live.filter((article) => article.featured),
+    latest: live,
+    categoryLists: boxSlugs.map((slug) => live.filter((article) => article.category?.slug === slug)),
+    boxSlugs,
+  }
+}
+
+export interface Replacement {
+  id: string
+  removedAt: string
+}
+
+// Replays the homepage from `since`: at every Homepage publish and every
+// article publish it works out what was shown, and records each article that
+// dropped out (latest removal wins if it came back and left again).
+export function replacementsOverTime(
+  versions: { time: string; picks: HomepagePicks }[],
+  pool: ArticleSummary[],
+  boxSlugs: string[],
+  since: string
+): Replacement[] {
+  if (versions.length === 0) return []
+  const start = new Date(since).getTime()
+  const times = [
+    since,
+    ...versions.map((version) => version.time),
+    ...pool.map((article) => article.publishedAt),
+  ].filter((time) => new Date(time).getTime() >= start)
+  const events = [...new Set(times)].sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+
+  const picksAt = (time: string) => {
+    const at = new Date(time).getTime()
+    let current = versions[0].picks
+    for (const version of versions) {
+      if (new Date(version.time).getTime() <= at) current = version.picks
+    }
+    return current
+  }
+
+  const removedAt = new Map<string, string>()
+  let previous: Set<string> | null = null
+  for (const time of events) {
+    const shown = new Set(
+      shownArticles(selectHomepage(picksAt(time), sourcesAt(pool, boxSlugs, time))).map((article) => article._id)
+    )
+    if (previous) {
+      for (const id of previous) if (!shown.has(id)) removedAt.set(id, time)
+    }
+    previous = shown
+  }
+  return [...removedAt].map(([id, time]) => ({ id, removedAt: time }))
+}
+
 export function pickOtherNews(
   latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],
