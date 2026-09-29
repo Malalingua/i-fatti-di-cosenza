@@ -3,7 +3,6 @@ import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { SecondaryArticle } from '@/components/SecondaryArticle'
 import { RaccoltaIndifferenziata } from '@/components/RaccoltaIndifferenziata'
 import { Ticker } from '@/components/Ticker'
-import { LatestNews } from '@/components/LatestNews'
 import type { SectionColor } from '@/components/SectionBar'
 import { LEAD_SECTION_TITLE } from '@/lib/constants'
 import { pickCategoryBoxes, pickOtherNews } from '@/lib/homepage'
@@ -65,8 +64,6 @@ export default async function HomePage() {
       </div>
 
       {raccolta.length > 0 && <RaccoltaIndifferenziata articles={raccolta} />}
-
-      <LatestNews articles={latest} />
     </main>
   )
 }

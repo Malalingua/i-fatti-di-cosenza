@@ -1,11 +1,10 @@
-export type SectionColor = 'red' | 'green' | 'blue' | 'brown' | 'dark'
+export type SectionColor = 'red' | 'green' | 'blue' | 'brown'
 
 export const SECTION_BG: Record<SectionColor, string> = {
   red: 'bg-[#d42a1c]',
   green: 'bg-[#1f4a34]',
   blue: 'bg-[#1b3d8f]',
   brown: 'bg-[#8c3b12]',
-  dark: 'bg-neutral-900',
 }
 
 interface SectionBarProps {

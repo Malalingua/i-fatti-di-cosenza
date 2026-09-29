@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { formatDate, formatMastheadDate, formatNewsTimestamp } from './date'
+import { formatDate, formatMastheadDate } from './date'
 
 describe('formatDate', () => {
   it('formats an ISO date in Italian long form', () => {
@@ -18,11 +18,5 @@ describe('formatMastheadDate', () => {
 
   it('uses the Italian calendar day, not UTC, near local midnight', () => {
     expect(formatMastheadDate(new Date('2026-01-01T00:30:00+01:00'))).toBe('Giovedì 1 gennaio 2026')
-  })
-})
-
-describe('formatNewsTimestamp', () => {
-  it('formats day, short month and Italian local time', () => {
-    expect(formatNewsTimestamp('2026-09-28T16:05:00.000Z')).toBe('28 set · 18:05')
   })
 })
