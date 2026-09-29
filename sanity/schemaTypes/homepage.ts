@@ -50,21 +50,30 @@ export const homepage = defineType({
     defineField({ name: 'raccolta2', title: '02', type: 'reference', to: [{ type: 'article' }], fieldset: 'raccolta' }),
     defineField({
       name: 'recentlyRemoved',
-      title: 'Usciti dalla homepage',
-      description: 'Aggiornato in automatico alla pubblicazione: gli articoli tolti dalla homepage scendono in “Ultime notizie”.',
+      title: 'Scesi in Ultime notizie',
+      description: 'Si aggiorna da solo quando premi Pubblica: gli articoli tolti dalla homepage finiscono qui e in cima a “Ultime notizie”.',
       type: 'array',
       of: [
         {
           type: 'object',
           name: 'removedArticle',
           fields: [
-            { name: 'article', type: 'reference', to: [{ type: 'article' }], weak: true },
-            { name: 'removedAt', type: 'datetime' },
+            { name: 'article', title: 'Articolo', type: 'reference', to: [{ type: 'article' }], weak: true },
+            { name: 'removedAt', title: 'Tolto il', type: 'datetime' },
           ],
+          preview: {
+            select: { title: 'article.title', media: 'article.coverImage', removedAt: 'removedAt' },
+            prepare: ({ title, media, removedAt }: { title?: string; media?: unknown; removedAt?: string }) => ({
+              title: title ?? 'Articolo eliminato',
+              media: media as never,
+              subtitle: removedAt
+                ? `Tolto il ${new Date(removedAt).toLocaleString('it-IT', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Europe/Rome' })}`
+                : '',
+            }),
+          },
         },
       ],
       readOnly: true,
-      hidden: true,
     }),
   ],
   preview: { prepare: () => ({ title: 'Homepage' }) },

@@ -95,33 +95,26 @@ export function pickManualOnly(
   })
 }
 
-// "Ultime notizie": articles taken off the homepage plus new articles never
-// placed on it, ordered by when they arrived in the column (removal or
-// publish time), latest first. Articles published before `since` only appear
-// once they have been removed from the homepage.
+// "Ultime notizie": every article not shown above. Articles taken off the
+// homepage come first, most recently removed on top; the rest follow newest
+// first, so nothing ever disappears from the page.
 export function buildLatestFeed(
   removed: { removedAt: string; article: ArticleSummary }[],
   latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],
-  since: string,
   limit: number
 ): ArticleSummary[] {
   const shownIds = new Set(shown.map((article) => article?._id))
-  const arrivals = new Map<string, { article: ArticleSummary; at: number }>()
-  const add = (article: ArticleSummary, at: string) => {
+  const feed: ArticleSummary[] = []
+  const add = (article: ArticleSummary) => {
     if (shownIds.has(article._id)) return
-    const time = new Date(at).getTime()
-    const existing = arrivals.get(article._id)
-    if (!existing || time > existing.at) arrivals.set(article._id, { article, at: time })
+    shownIds.add(article._id)
+    feed.push(article)
   }
-  for (const item of removed) add(item.article, item.removedAt)
-  for (const article of latest) {
-    if (new Date(article.publishedAt) >= new Date(since)) add(article, article.publishedAt)
-  }
-  return [...arrivals.values()]
-    .sort((a, b) => b.at - a.at)
-    .slice(0, limit)
-    .map((item) => item.article)
+  const byRemoval = [...removed].sort((a, b) => new Date(b.removedAt).getTime() - new Date(a.removedAt).getTime())
+  for (const item of byRemoval) add(item.article)
+  for (const article of latest) add(article)
+  return feed.slice(0, limit)
 }
 
 export function pickOtherNews(

@@ -191,23 +191,22 @@ describe('pickManualOnly', () => {
 })
 
 describe('buildLatestFeed', () => {
-  const SINCE = '2026-09-29T00:00:00.000Z'
-
-  it('puts a new unplaced article on top', () => {
+  it('lists articles removed from the homepage first, most recent removal on top', () => {
     const fresh = at('fresh', '2026-09-29T17:40:00.000Z')
-    const earlier = at('earlier', '2026-09-29T16:00:00.000Z')
-    expect(buildLatestFeed([], [fresh, earlier], [], SINCE, 10).map((x) => x._id)).toEqual(['fresh', 'earlier'])
+    const first = { article: at('first', '2026-09-24T10:00:00.000Z'), removedAt: '2026-09-29T17:50:00.000Z' }
+    const second = { article: at('second', '2026-09-20T10:00:00.000Z'), removedAt: '2026-09-29T18:00:00.000Z' }
+    expect(buildLatestFeed([first, second], [fresh], [], 10).map((x) => x._id)).toEqual(['second', 'first', 'fresh'])
   })
 
-  it('puts an article just removed from the homepage above newer publications', () => {
-    const fresh = at('fresh', '2026-09-29T17:40:00.000Z')
-    const removed = { article: at('removed', '2026-09-24T10:00:00.000Z'), removedAt: '2026-09-29T18:00:00.000Z' }
-    expect(buildLatestFeed([removed], [fresh], [], SINCE, 10).map((x) => x._id)).toEqual(['removed', 'fresh'])
-  })
-
-  it('leaves out articles shown above and old articles never removed', () => {
-    const shown = at('shown', '2026-09-29T17:00:00.000Z')
+  it('keeps every article not shown above, newest first, so nothing disappears', () => {
+    const recent = at('recent', '2026-09-29T17:40:00.000Z')
     const old = at('old', '2026-09-24T10:00:00.000Z')
-    expect(buildLatestFeed([], [shown, old], [shown], SINCE, 10)).toEqual([])
+    const shown = at('shown', '2026-09-29T17:00:00.000Z')
+    expect(buildLatestFeed([], [recent, shown, old], [shown], 10).map((x) => x._id)).toEqual(['recent', 'old'])
+  })
+
+  it('does not repeat an article that is both removed and recent', () => {
+    const a = at('a', '2026-09-29T17:40:00.000Z')
+    expect(buildLatestFeed([{ article: a, removedAt: '2026-09-29T18:00:00.000Z' }], [a], [], 10).map((x) => x._id)).toEqual(['a'])
   })
 })

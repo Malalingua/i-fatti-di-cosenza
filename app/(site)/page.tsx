@@ -11,10 +11,6 @@ import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 60
 
-// Articles published before this date stay out of "Ultime notizie" unless they
-// are taken off the homepage.
-const FEED_START = '2026-09-29T00:00:00+02:00'
-
 const BOXES: { slug: string; title: string; color: SectionColor; layout: 'stacked' | 'side' }[] = [
   { slug: 'come-campiamo', title: 'Come campiamo', color: 'green', layout: 'stacked' },
   { slug: 'poltrone', title: 'Poltrone & potere', color: 'blue', layout: 'stacked' },
@@ -48,7 +44,7 @@ export default async function HomePage() {
   )
   const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
   const raccolta = pickManualOnly(homepage.raccolta, shownAbove, 2)
-  const olderNews = buildLatestFeed(homepage.recentlyRemoved, latest, [...shownAbove, ...raccolta], FEED_START, 20)
+  const olderNews = buildLatestFeed(homepage.recentlyRemoved, latest, [...shownAbove, ...raccolta], 20)
   const tickerArticle = latest[0]
 
   // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and
