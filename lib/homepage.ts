@@ -95,26 +95,24 @@ export function pickManualOnly(
   })
 }
 
-// "Ultime notizie": every article not shown above. Articles taken off the
-// homepage come first, most recently removed on top; the rest follow newest
-// first, so nothing ever disappears from the page.
+// "Ultime notizie": only articles replaced in a homepage box, most recently
+// replaced on top, whatever their publish date. Articles back on the homepage
+// are left out.
 export function buildLatestFeed(
   removed: { removedAt: string; article: ArticleSummary }[],
-  latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],
   limit: number
 ): ArticleSummary[] {
   const shownIds = new Set(shown.map((article) => article?._id))
-  const feed: ArticleSummary[] = []
-  const add = (article: ArticleSummary) => {
-    if (shownIds.has(article._id)) return
-    shownIds.add(article._id)
-    feed.push(article)
-  }
-  const byRemoval = [...removed].sort((a, b) => new Date(b.removedAt).getTime() - new Date(a.removedAt).getTime())
-  for (const item of byRemoval) add(item.article)
-  for (const article of latest) add(article)
-  return feed.slice(0, limit)
+  return [...removed]
+    .sort((a, b) => new Date(b.removedAt).getTime() - new Date(a.removedAt).getTime())
+    .map((item) => item.article)
+    .filter((article) => {
+      if (shownIds.has(article._id)) return false
+      shownIds.add(article._id)
+      return true
+    })
+    .slice(0, limit)
 }
 
 export function pickOtherNews(

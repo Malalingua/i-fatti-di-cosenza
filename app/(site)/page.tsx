@@ -44,7 +44,7 @@ export default async function HomePage() {
   )
   const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
   const raccolta = pickManualOnly(homepage.raccolta, shownAbove, 2)
-  const olderNews = buildLatestFeed(homepage.recentlyRemoved, latest, [...shownAbove, ...raccolta], 20)
+  const olderNews = buildLatestFeed(homepage.recentlyRemoved, [...shownAbove, ...raccolta], 20)
   const tickerArticle = latest[0]
 
   // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and

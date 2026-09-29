@@ -191,22 +191,18 @@ describe('pickManualOnly', () => {
 })
 
 describe('buildLatestFeed', () => {
-  it('lists articles removed from the homepage first, most recent removal on top', () => {
-    const fresh = at('fresh', '2026-09-29T17:40:00.000Z')
-    const first = { article: at('first', '2026-09-24T10:00:00.000Z'), removedAt: '2026-09-29T17:50:00.000Z' }
+  it('orders by replacement time, latest replaced on top, whatever the publish date', () => {
+    const first = { article: at('first', '2026-09-29T10:00:00.000Z'), removedAt: '2026-09-29T17:50:00.000Z' }
     const second = { article: at('second', '2026-09-20T10:00:00.000Z'), removedAt: '2026-09-29T18:00:00.000Z' }
-    expect(buildLatestFeed([first, second], [fresh], [], 10).map((x) => x._id)).toEqual(['second', 'first', 'fresh'])
+    expect(buildLatestFeed([first, second], [], 10).map((x) => x._id)).toEqual(['second', 'first'])
   })
 
-  it('keeps every article not shown above, newest first, so nothing disappears', () => {
-    const recent = at('recent', '2026-09-29T17:40:00.000Z')
-    const old = at('old', '2026-09-24T10:00:00.000Z')
-    const shown = at('shown', '2026-09-29T17:00:00.000Z')
-    expect(buildLatestFeed([], [recent, shown, old], [shown], 10).map((x) => x._id)).toEqual(['recent', 'old'])
+  it('is empty when nothing has been replaced yet', () => {
+    expect(buildLatestFeed([], [], 10)).toEqual([])
   })
 
-  it('does not repeat an article that is both removed and recent', () => {
-    const a = at('a', '2026-09-29T17:40:00.000Z')
-    expect(buildLatestFeed([{ article: a, removedAt: '2026-09-29T18:00:00.000Z' }], [a], [], 10).map((x) => x._id)).toEqual(['a'])
+  it('leaves out an article that is back on the homepage', () => {
+    const a = at('a', '2026-09-29T10:00:00.000Z')
+    expect(buildLatestFeed([{ article: a, removedAt: '2026-09-29T18:00:00.000Z' }], [a], 10)).toEqual([])
   })
 })
