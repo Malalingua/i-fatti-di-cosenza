@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickManualOnly, buildLatestFeed } from './homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickManualOnly, buildLatestFeed, selectHomepage, shownArticles } from './homepage'
 import type { ArticleSummary, Category } from './sanity/types'
 
 function makeCategory(name: string, slug: string): Category {
@@ -204,5 +204,31 @@ describe('buildLatestFeed', () => {
   it('leaves out an article that is back on the homepage', () => {
     const a = at('a', '2026-09-29T10:00:00.000Z')
     expect(buildLatestFeed([{ article: a, removedAt: '2026-09-29T18:00:00.000Z' }], [a], 10)).toEqual([])
+  })
+})
+
+describe('selectHomepage', () => {
+  const sources = (overrides: Partial<Parameters<typeof selectHomepage>[1]> = {}) => ({
+    featured: [],
+    latest: [],
+    categoryLists: [[]],
+    boxSlugs: ['poltrone'],
+    ...overrides,
+  })
+
+  it('uses the featured article as lead when none is picked, so replacing it counts', () => {
+    const scuola = makeArticle('scuola', 'carta-canta')
+    const giudice = makeArticle('giudice', 'tribunali-e-tribolazioni')
+    const before = selectHomepage({ lead: null, slots: [], raccolta: [] }, sources({ featured: [scuola] }))
+    const after = selectHomepage({ lead: giudice, slots: [], raccolta: [] }, sources({ featured: [scuola] }))
+    expect(shownArticles(before).map((a) => a._id)).toEqual(['scuola'])
+    expect(shownArticles(after).map((a) => a._id)).toEqual(['giudice'])
+  })
+
+  it('lists the automatic box article as shown', () => {
+    const lead = makeArticle('lead', 'carta-canta')
+    const auto = makeArticle('auto', 'poltrone')
+    const layout = selectHomepage({ lead, slots: [null], raccolta: [] }, sources({ categoryLists: [[auto]] }))
+    expect(shownArticles(layout).map((a) => a._id)).toEqual(['lead', 'auto'])
   })
 })

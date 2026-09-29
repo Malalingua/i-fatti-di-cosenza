@@ -1,46 +1,47 @@
-// Rebuilds, from Sanity's document history, which articles were replaced in
-// the homepage boxes and when. This runs on the server, so it works however
-// the Homepage is published. Reading history needs a read token
-// (SANITY_READ_TOKEN); without it the list is empty.
+// Reads, from Sanity's document history, every published version of the
+// Homepage since the "Ultime notizie" reset. The site compares what each
+// version showed to find which articles were replaced and when. This runs on
+// the server, so it works however the Homepage is published. Reading history
+// needs a read token (SANITY_READ_TOKEN); without it there are no versions.
 
-export const HOMEPAGE_SLOT_FIELDS = [
-  'lead',
-  'topLeft',
-  'topRight',
-  'bottomLeft',
-  'bottomRight',
-  'raccolta1',
-  'raccolta2',
-] as const
+export const HOMEPAGE_SLOT_FIELDS = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'] as const
+export const HOMEPAGE_RACCOLTA_FIELDS = ['raccolta1', 'raccolta2'] as const
 
 // Replacements before this moment are ignored ("Ultime notizie" was reset).
 export const FEED_RESET = '2026-09-29T18:00:00Z'
 
-type HomepageDoc = Partial<Record<(typeof HOMEPAGE_SLOT_FIELDS)[number], { _ref?: string }>> | null | undefined
+type Ref = { _ref?: string } | undefined
+export type HomepageDoc = Record<string, Ref> | null
+
+export interface HomepageVersion {
+  time: string
+  doc: HomepageDoc
+}
 
 export interface Replacement {
   id: string
   removedAt: string
 }
 
-function slotIds(doc: HomepageDoc): Set<string> {
+export function referencedIds(versions: HomepageVersion[]): string[] {
   const ids = new Set<string>()
-  for (const field of HOMEPAGE_SLOT_FIELDS) {
-    const id = doc?.[field]?._ref
-    if (id) ids.add(id)
+  for (const { doc } of versions) {
+    for (const field of ['lead', ...HOMEPAGE_SLOT_FIELDS, ...HOMEPAGE_RACCOLTA_FIELDS]) {
+      const id = doc?.[field]?._ref
+      if (id) ids.add(id)
+    }
   }
-  return ids
+  return [...ids]
 }
 
-// `states` are successive published versions, oldest first; the first one is
-// the baseline. An article counts as replaced when it leaves every slot; if it
+// `states` list what the homepage showed, oldest first; the first one is the
+// baseline. An article counts as replaced when it stops being shown; if it
 // comes back and leaves again, the latest removal wins.
-export function replacementsFromStates(states: { time: string; doc: HomepageDoc }[]): Replacement[] {
+export function replacementsFromShown(states: { time: string; shown: string[] }[]): Replacement[] {
   const removedAt = new Map<string, string>()
   for (let i = 1; i < states.length; i++) {
-    const before = slotIds(states[i - 1].doc)
-    const after = slotIds(states[i].doc)
-    for (const id of before) {
+    const after = new Set(states[i].shown)
+    for (const id of states[i - 1].shown) {
       if (!after.has(id)) removedAt.set(id, states[i].time)
     }
   }
@@ -71,7 +72,7 @@ async function documentAt(query: string, immutable: boolean): Promise<HomepageDo
   return body.documents?.[0] ?? null
 }
 
-export async function getHomepageReplacements(): Promise<Replacement[]> {
+export async function getHomepageVersions(): Promise<HomepageVersion[]> {
   const transactionsResponse = await historyRequest(
     `transactions/homepage?excludeContent=true&fromTime=${encodeURIComponent(FEED_RESET)}`,
     false
@@ -88,8 +89,8 @@ export async function getHomepageReplacements(): Promise<Replacement[]> {
     documentAt(`time=${encodeURIComponent(FEED_RESET)}`, true),
     ...transactions.map((transaction) => documentAt(`revision=${transaction.id}`, true)),
   ])
-  return replacementsFromStates([
+  return [
     { time: FEED_RESET, doc: baseline },
     ...transactions.map((transaction, i) => ({ time: transaction.timestamp, doc: versions[i] })),
-  ])
+  ]
 }

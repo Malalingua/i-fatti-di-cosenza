@@ -5,7 +5,13 @@ import {
   getHomepageSlots,
   getLatestArticles,
 } from '@/lib/sanity/queries'
-import { getHomepageReplacements } from '@/lib/sanity/homepageHistory'
+import {
+  HOMEPAGE_RACCOLTA_FIELDS,
+  HOMEPAGE_SLOT_FIELDS,
+  getHomepageVersions,
+  referencedIds,
+  replacementsFromShown,
+} from '@/lib/sanity/homepageHistory'
 import { FeaturedArticle } from '@/components/FeaturedArticle'
 import { SecondaryArticle } from '@/components/SecondaryArticle'
 import { RaccoltaIndifferenziata } from '@/components/RaccoltaIndifferenziata'
@@ -13,7 +19,7 @@ import { Ticker } from '@/components/Ticker'
 import { LatestNews } from '@/components/LatestNews'
 import type { SectionColor } from '@/components/SectionBar'
 import { LEAD_SECTION_TITLE } from '@/lib/constants'
-import { buildLatestFeed, pickCategoryBoxes, pickManualOnly } from '@/lib/homepage'
+import { buildLatestFeed, selectHomepage, shownArticles, type HomepageSources } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 60
@@ -26,17 +32,18 @@ const BOXES: { slug: string; title: string; color: SectionColor; layout: 'stacke
 ]
 
 export default async function HomePage() {
-  const [homepage, replacements, featured, latest, ...categoryLists] = await Promise.all([
+  const [homepage, versions, featured, latest, ...categoryLists] = await Promise.all([
     getHomepageSlots(),
-    getHomepageReplacements(),
+    getHomepageVersions(),
     getFeaturedArticles(1),
     getLatestArticles(30),
     ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 3)),
   ])
 
-  const lead = homepage.lead ?? featured[0] ?? latest[0]
+  const sources: HomepageSources = { featured, latest, categoryLists, boxSlugs: BOXES.map((box) => box.slug) }
+  const layout = selectHomepage(homepage, sources)
 
-  if (!lead) {
+  if (!layout) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-8">
         <p className="text-neutral-500">Nessun articolo pubblicato.</p>
@@ -44,20 +51,35 @@ export default async function HomePage() {
     )
   }
 
-  const boxArticles = pickCategoryBoxes(
-    categoryLists,
-    [lead._id],
-    homepage.slots,
-    BOXES.map((box) => box.slug)
+  const { lead, boxes: boxArticles, raccolta } = layout
+
+  // "Ultime notizie": work out what each past Homepage version showed (with
+  // today's automatic choices) and list the articles that dropped out.
+  const historyArticles = new Map(
+    (await getArticlesByIds(referencedIds(versions))).map((article) => [article._id, article])
   )
-  const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
-  const raccolta = pickManualOnly(homepage.raccolta, shownAbove, 2)
+  const resolve = (ref: { _ref?: string } | undefined) => (ref?._ref && historyArticles.get(ref._ref)) || null
+  const replacements = replacementsFromShown(
+    versions.map(({ time, doc }) => ({
+      time,
+      shown: shownArticles(
+        selectHomepage(
+          {
+            lead: resolve(doc?.lead),
+            slots: HOMEPAGE_SLOT_FIELDS.map((field) => resolve(doc?.[field])),
+            raccolta: HOMEPAGE_RACCOLTA_FIELDS.map((field) => resolve(doc?.[field])),
+          },
+          sources
+        )
+      ).map((article) => article._id),
+    }))
+  )
   const replacedArticles = await getArticlesByIds(replacements.map((replacement) => replacement.id))
   const removed = replacements.flatMap((replacement) => {
     const article = replacedArticles.find((candidate) => candidate._id === replacement.id)
     return article ? [{ article, removedAt: replacement.removedAt }] : []
   })
-  const olderNews = buildLatestFeed(removed, [...shownAbove, ...raccolta], 20)
+  const olderNews = buildLatestFeed(removed, shownArticles(layout), 20)
   const tickerArticle = latest[0]
 
   // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and

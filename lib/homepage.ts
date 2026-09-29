@@ -115,6 +115,43 @@ export function buildLatestFeed(
     .slice(0, limit)
 }
 
+export interface HomepagePicks {
+  lead: ArticleSummary | null
+  slots: (ArticleSummary | null)[]
+  raccolta: (ArticleSummary | null)[]
+}
+
+export interface HomepageSources {
+  featured: ArticleSummary[]
+  latest: ArticleSummary[]
+  categoryLists: ArticleSummary[][]
+  boxSlugs: string[]
+}
+
+export interface HomepageLayout {
+  lead: ArticleSummary
+  boxes: (ArticleSummary | undefined)[]
+  raccolta: (ArticleSummary | null)[]
+}
+
+// What the homepage actually shows for a set of editor picks, including the
+// automatic choices (featured/latest lead, newest article per category box).
+export function selectHomepage(picks: HomepagePicks, sources: HomepageSources): HomepageLayout | null {
+  const lead = picks.lead ?? sources.featured[0] ?? sources.latest[0]
+  if (!lead) return null
+  const boxes = pickCategoryBoxes(sources.categoryLists, [lead._id], picks.slots, sources.boxSlugs)
+  const above = [lead, ...boxes.filter((article): article is ArticleSummary => Boolean(article))]
+  const raccolta = pickManualOnly(picks.raccolta, above, 2)
+  return { lead, boxes, raccolta }
+}
+
+export function shownArticles(layout: HomepageLayout | null): ArticleSummary[] {
+  if (!layout) return []
+  return [layout.lead, ...layout.boxes, ...layout.raccolta].filter((article): article is ArticleSummary =>
+    Boolean(article)
+  )
+}
+
 export function pickOtherNews(
   latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],

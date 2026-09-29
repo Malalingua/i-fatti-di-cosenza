@@ -1,45 +1,38 @@
 import { describe, it, expect } from 'vitest'
-import { replacementsFromStates } from './homepageHistory'
+import { referencedIds, replacementsFromShown } from './homepageHistory'
 
-const ref = (id: string) => ({ _ref: id })
-
-describe('replacementsFromStates', () => {
-  it('records an article replaced in a box with the time of that publish', () => {
+describe('replacementsFromShown', () => {
+  it('records an article that stops being shown, with the time of that publish', () => {
     const states = [
-      { time: 't0', doc: { topRight: ref('david-rossi') } },
-      { time: 't1', doc: { topRight: ref('caro-prezzi') } },
+      { time: 't0', shown: ['scuola', 'x'] },
+      { time: 't1', shown: ['giudice', 'x'] },
     ]
-    expect(replacementsFromStates(states)).toEqual([{ id: 'david-rossi', removedAt: 't1' }])
+    expect(replacementsFromShown(states)).toEqual([{ id: 'scuola', removedAt: 't1' }])
   })
 
-  it('tracks the lead and the Raccolta slots too', () => {
-    const states = [
-      { time: 't0', doc: { lead: ref('a'), raccolta2: ref('b') } },
-      { time: 't1', doc: { lead: ref('c'), raccolta2: ref('d') } },
-    ]
-    expect(replacementsFromStates(states).map((r) => r.id)).toEqual(['a', 'b'])
+  it('does not count an article that only moves to another box', () => {
+    expect(replacementsFromShown([{ time: 't0', shown: ['a', 'b'] }, { time: 't1', shown: ['b', 'a'] }])).toEqual([])
   })
 
-  it('does not count an article moved to another box as replaced', () => {
+  it('keeps the latest removal when an article comes back and leaves again', () => {
     const states = [
-      { time: 't0', doc: { topLeft: ref('a'), topRight: ref('b') } },
-      { time: 't1', doc: { topLeft: ref('b'), topRight: ref('c') } },
+      { time: 't0', shown: ['a'] },
+      { time: 't1', shown: ['b'] },
+      { time: 't2', shown: ['a'] },
+      { time: 't3', shown: ['c'] },
     ]
-    expect(replacementsFromStates(states).map((r) => r.id)).toEqual(['a'])
-  })
-
-  it('keeps the latest removal when an article comes back and is replaced again', () => {
-    const states = [
-      { time: 't0', doc: { topLeft: ref('a') } },
-      { time: 't1', doc: { topLeft: ref('b') } },
-      { time: 't2', doc: { topLeft: ref('a') } },
-      { time: 't3', doc: { topLeft: ref('c') } },
-    ]
-    const byId = Object.fromEntries(replacementsFromStates(states).map((r) => [r.id, r.removedAt]))
+    const byId = Object.fromEntries(replacementsFromShown(states).map((r) => [r.id, r.removedAt]))
     expect(byId).toEqual({ a: 't3', b: 't2' })
   })
+})
 
-  it('returns nothing without changes', () => {
-    expect(replacementsFromStates([{ time: 't0', doc: { topLeft: ref('a') } }])).toEqual([])
+describe('referencedIds', () => {
+  it('collects every article referenced by any version, once', () => {
+    const versions = [
+      { time: 't0', doc: { lead: { _ref: 'a' }, topLeft: { _ref: 'b' } } },
+      { time: 't1', doc: { lead: { _ref: 'a' }, raccolta2: { _ref: 'c' } } },
+      { time: 't2', doc: null },
+    ]
+    expect(referencedIds(versions).sort()).toEqual(['a', 'b', 'c'])
   })
 })
