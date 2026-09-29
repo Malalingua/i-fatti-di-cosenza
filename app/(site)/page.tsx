@@ -9,7 +9,7 @@ import { LEAD_SECTION_TITLE } from '@/lib/constants'
 import { buildLatestFeed, pickCategoryBoxes, pickManualOnly } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
-export const revalidate = 300
+export const revalidate = 60
 
 // Articles published before this date stay out of "Ultime notizie" unless they
 // are taken off the homepage.
