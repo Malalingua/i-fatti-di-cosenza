@@ -48,6 +48,15 @@ export const homepage = defineType({
     slot('bottomRight', 'Tribunali e tribolazioni (marrone)', 'tribunali-e-tribolazioni'),
     defineField({ name: 'raccolta1', title: '01', type: 'reference', to: [{ type: 'article' }], fieldset: 'raccolta' }),
     defineField({ name: 'raccolta2', title: '02', type: 'reference', to: [{ type: 'article' }], fieldset: 'raccolta' }),
+    defineField({
+      name: 'recentlyRemoved',
+      title: 'Usciti dalla homepage',
+      description: 'Aggiornato in automatico alla pubblicazione: gli articoli tolti dalla homepage aprono la colonna “Ultime notizie”.',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'article' }], weak: true }],
+      readOnly: true,
+      hidden: true,
+    }),
   ],
   preview: { prepare: () => ({ title: 'Homepage' }) },
 })

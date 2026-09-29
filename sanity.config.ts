@@ -3,6 +3,7 @@ import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import { itITLocale } from '@sanity/locale-it-it'
 import { schemaTypes } from './sanity/schemaTypes'
+import { HomepagePublishAction } from './sanity/actions/homepagePublish'
 
 const SINGLETON_TYPES = new Set(['homepage'])
 const SINGLETON_ACTIONS = new Set(['publish', 'discardChanges', 'restore'])
@@ -38,7 +39,11 @@ export default defineConfig({
     templates: (templates) => templates.filter(({ schemaType }) => !SINGLETON_TYPES.has(schemaType)),
   },
   document: {
-    actions: (actions, { schemaType }) =>
-      SINGLETON_TYPES.has(schemaType) ? actions.filter(({ action }) => action && SINGLETON_ACTIONS.has(action)) : actions,
+    actions: (actions, { schemaType }) => {
+      if (!SINGLETON_TYPES.has(schemaType)) return actions
+      return actions
+        .filter(({ action }) => action && SINGLETON_ACTIONS.has(action))
+        .map((action) => (schemaType === 'homepage' && action.action === 'publish' ? HomepagePublishAction : action))
+    },
   },
 })

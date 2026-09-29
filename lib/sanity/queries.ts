@@ -31,7 +31,8 @@ export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0
   "raccolta": [
     select(raccolta1->publishedAt <= now() => raccolta1->{ ${articleSummaryFields} }),
     select(raccolta2->publishedAt <= now() => raccolta2->{ ${articleSummaryFields} })
-  ]
+  ],
+  "recentlyRemoved": recentlyRemoved[]->{ ${articleSummaryFields} }
 }`
 
 export const latestArticlesQuery = `*[_type == "article" && ${isPublished}] | order(publishedAt desc) [0...$limit] { ${articleSummaryFields} }`
@@ -58,11 +59,20 @@ export interface HomepageSelection {
   lead: ArticleSummary | null
   slots: (ArticleSummary | null)[]
   raccolta: (ArticleSummary | null)[]
+  recentlyRemoved: (ArticleSummary | null)[]
 }
 
 export async function getHomepageSlots(): Promise<HomepageSelection> {
   const result: Partial<HomepageSelection> | null = await client.fetch(homepageSlotsQuery)
-  return { lead: result?.lead ?? null, slots: result?.slots ?? [], raccolta: result?.raccolta ?? [] }
+  return {
+    lead: result?.lead ?? null,
+    slots: result?.slots ?? [],
+    raccolta: result?.raccolta ?? [],
+    // Deleted (weak) references come back null; scheduled articles stay hidden.
+    recentlyRemoved: (result?.recentlyRemoved ?? []).filter(
+      (article) => article && new Date(article.publishedAt) <= new Date()
+    ),
+  }
 }
 
 export async function getLatestArticles(limit: number): Promise<ArticleSummary[]> {
