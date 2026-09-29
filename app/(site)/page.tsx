@@ -11,11 +11,11 @@ import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 300
 
-const BOXES: { slug: string; title: string; color: SectionColor; span: string; layout: 'stacked' | 'side' }[] = [
-  { slug: 'come-campiamo', title: 'Come campiamo', color: 'green', span: '', layout: 'stacked' },
-  { slug: 'poltrone', title: 'Poltrone & potere', color: 'blue', span: '', layout: 'stacked' },
-  { slug: 'carta-canta', title: 'Carta canta', color: 'red', span: 'md:col-span-2', layout: 'side' },
-  { slug: 'tribunali-e-tribolazioni', title: 'Tribunali e tribolazioni', color: 'brown', span: 'md:col-span-2', layout: 'side' },
+const BOXES: { slug: string; title: string; color: SectionColor; layout: 'stacked' | 'side' }[] = [
+  { slug: 'come-campiamo', title: 'Come campiamo', color: 'green', layout: 'stacked' },
+  { slug: 'poltrone', title: 'Poltrone & potere', color: 'blue', layout: 'stacked' },
+  { slug: 'carta-canta', title: 'Carta canta', color: 'red', layout: 'side' },
+  { slug: 'tribunali-e-tribolazioni', title: 'Tribunali e tribolazioni', color: 'brown', layout: 'side' },
 ]
 
 export default async function HomePage() {
@@ -38,7 +38,6 @@ export default async function HomePage() {
 
   const boxArticles = pickCategoryBoxes(
     categoryLists,
-    latest,
     [lead._id],
     homepage.slots,
     BOXES.map((box) => box.slug)
@@ -50,12 +49,22 @@ export default async function HomePage() {
   const olderNews = pickOtherNews(latest, [...shownAbove, ...raccolta], 20)
   const tickerArticle = latest[0]
 
+  // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and
+  // its partner widens so the grid keeps the template's shape.
+  const partner = [1, 0, 3, 2]
+  const boxSpan = (index: number) => {
+    const alone = !boxArticles[partner[index]]
+    if (index < 2) return alone ? 'md:col-span-2' : ''
+    return alone ? 'md:col-span-2 lg:col-span-4' : 'md:col-span-2'
+  }
+  const leadSpan = boxArticles[0] || boxArticles[1] ? 'md:col-span-2' : 'md:col-span-2 lg:col-span-4'
+
   const renderBox = (index: number) => {
     const box = BOXES[index]
     const article = boxArticles[index]
     if (!article) return null
     return (
-      <div key={box.slug} className={box.span}>
+      <div key={box.slug} className={boxSpan(index)}>
         <SecondaryArticle article={article} title={box.title} color={box.color} layout={box.layout} />
       </div>
     )
@@ -66,7 +75,7 @@ export default async function HomePage() {
       {tickerArticle && <Ticker article={tickerArticle} />}
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="md:col-span-2">
+        <div className={leadSpan}>
           <FeaturedArticle article={lead} title={LEAD_SECTION_TITLE} />
         </div>
         {renderBox(0)}

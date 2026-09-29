@@ -129,19 +129,18 @@ describe('pickCategoryBoxes', () => {
     const lead = makeArticle('lead', 'come-campiamo')
     const cc = makeArticle('cc', 'come-campiamo')
     const pp = makeArticle('pp', 'poltrone')
-    const boxes = pickCategoryBoxes([[lead, cc], [pp]], [], ['lead'])
+    const boxes = pickCategoryBoxes([[lead, cc], [pp]], ['lead'])
     expect(boxes.map((a) => a?._id)).toEqual(['cc', 'pp'])
   })
 
-  it('fills an empty category with the newest unused fallback article', () => {
+  it('leaves a box empty rather than showing an article from another category', () => {
     const pp = makeArticle('pp', 'poltrone')
-    const other = makeArticle('other', 'carta-canta')
-    const boxes = pickCategoryBoxes([[], [pp]], [pp, other], [])
-    expect(boxes.map((a) => a?._id)).toEqual(['other', 'pp'])
+    const boxes = pickCategoryBoxes([[], [pp]], [])
+    expect(boxes.map((a) => a?._id)).toEqual([undefined, 'pp'])
   })
 
   it('returns undefined when nothing is left to show', () => {
-    expect(pickCategoryBoxes([[]], [], [])).toEqual([undefined])
+    expect(pickCategoryBoxes([[]], [])).toEqual([undefined])
   })
 })
 
@@ -149,28 +148,28 @@ describe('pickCategoryBoxes with manual picks', () => {
   it('uses the manual pick for its box instead of the newest article', () => {
     const newest = makeArticle('newest', 'come-campiamo')
     const chosen = makeArticle('chosen', 'come-campiamo')
-    const boxes = pickCategoryBoxes([[newest, chosen]], [], [], [chosen], ['come-campiamo'])
+    const boxes = pickCategoryBoxes([[newest, chosen]], [], [chosen], ['come-campiamo'])
     expect(boxes.map((a) => a?._id)).toEqual(['chosen'])
   })
 
   it('does not reuse a manual pick in another box', () => {
     const chosen = makeArticle('chosen', 'poltrone')
     const other = makeArticle('other', 'poltrone')
-    const boxes = pickCategoryBoxes([[chosen, other], [chosen, other]], [], [], [null, chosen], ['poltrone', 'poltrone'])
+    const boxes = pickCategoryBoxes([[chosen, other], [chosen, other]], [], [null, chosen], ['poltrone', 'poltrone'])
     expect(boxes.map((a) => a?._id)).toEqual(['other', 'chosen'])
   })
 
   it('ignores a manual pick from a different category', () => {
     const wrong = makeArticle('wrong', 'come-campiamo')
     const right = makeArticle('right', 'carta-canta')
-    const boxes = pickCategoryBoxes([[right]], [], [], [wrong], ['carta-canta'])
+    const boxes = pickCategoryBoxes([[right]], [], [wrong], ['carta-canta'])
     expect(boxes.map((a) => a?._id)).toEqual(['right'])
   })
 
   it('ignores a manual pick that is already the lead', () => {
     const lead = makeArticle('lead', 'poltrone')
     const other = makeArticle('other', 'poltrone')
-    const boxes = pickCategoryBoxes([[lead, other]], [], ['lead'], [lead], ['poltrone'])
+    const boxes = pickCategoryBoxes([[lead, other]], ['lead'], [lead], ['poltrone'])
     expect(boxes.map((a) => a?._id)).toEqual(['other'])
   })
 })
