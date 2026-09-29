@@ -6,10 +6,14 @@ import { Ticker } from '@/components/Ticker'
 import { LatestNews } from '@/components/LatestNews'
 import type { SectionColor } from '@/components/SectionBar'
 import { LEAD_SECTION_TITLE } from '@/lib/constants'
-import { pickCategoryBoxes, pickWithManual } from '@/lib/homepage'
+import { buildLatestFeed, pickCategoryBoxes, pickManualOnly } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 300
+
+// Articles published before this date stay out of "Ultime notizie" unless they
+// are taken off the homepage.
+const FEED_START = '2026-09-29T00:00:00+02:00'
 
 const BOXES: { slug: string; title: string; color: SectionColor; layout: 'stacked' | 'side' }[] = [
   { slug: 'come-campiamo', title: 'Come campiamo', color: 'green', layout: 'stacked' },
@@ -43,9 +47,8 @@ export default async function HomePage() {
     BOXES.map((box) => box.slug)
   )
   const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
-  const raccolta = pickWithManual(homepage.raccolta, latest, shownAbove, 2)
-  // Only articles taken off the homepage, most recently removed first.
-  const olderNews = pickWithManual(homepage.recentlyRemoved, [], [...shownAbove, ...raccolta], 20)
+  const raccolta = pickManualOnly(homepage.raccolta, shownAbove, 2)
+  const olderNews = buildLatestFeed(homepage.recentlyRemoved, latest, [...shownAbove, ...raccolta], FEED_START, 20)
   const tickerArticle = latest[0]
 
   // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and
@@ -83,7 +86,7 @@ export default async function HomePage() {
         {renderBox(3)}
       </div>
 
-      {raccolta.length > 0 && <RaccoltaIndifferenziata articles={raccolta} />}
+      <RaccoltaIndifferenziata articles={raccolta} />
 
       {olderNews.length > 0 && <LatestNews articles={olderNews} />}
     </main>

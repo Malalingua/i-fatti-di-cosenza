@@ -18,7 +18,7 @@ export const HomepagePublishAction: DocumentActionComponent = (props) => {
     disabled: Boolean(publish.disabled) || isPublishing,
     onHandle: () => {
       setIsPublishing(true)
-      const history = nextRemovedHistory(props.published as never, props.draft as never)
+      const history = nextRemovedHistory(props.published as never, props.draft as never, new Date().toISOString())
       if (history) patch.execute([{ set: { recentlyRemoved: history } }])
       publish.execute()
       props.onComplete()

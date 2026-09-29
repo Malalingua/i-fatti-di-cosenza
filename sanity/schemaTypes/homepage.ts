@@ -30,7 +30,7 @@ export const homepage = defineType({
     {
       name: 'raccolta',
       title: 'Raccolta indifferenziata',
-      description: 'Scegli i due articoli di “Le malelingue del web”. Se vuoti, vengono riempiti con gli ultimi articoli non mostrati sopra.',
+      description: 'Scegli i due articoli di “Le malelingue del web”. Un box vuoto resta vuoto.',
       options: { columns: 2 },
     },
   ],
@@ -51,9 +51,18 @@ export const homepage = defineType({
     defineField({
       name: 'recentlyRemoved',
       title: 'Usciti dalla homepage',
-      description: 'Aggiornato in automatico alla pubblicazione: gli articoli tolti dalla homepage aprono la colonna “Ultime notizie”.',
+      description: 'Aggiornato in automatico alla pubblicazione: gli articoli tolti dalla homepage scendono in “Ultime notizie”.',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'article' }], weak: true }],
+      of: [
+        {
+          type: 'object',
+          name: 'removedArticle',
+          fields: [
+            { name: 'article', type: 'reference', to: [{ type: 'article' }], weak: true },
+            { name: 'removedAt', type: 'datetime' },
+          ],
+        },
+      ],
       readOnly: true,
       hidden: true,
     }),

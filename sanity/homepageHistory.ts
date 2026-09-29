@@ -1,5 +1,5 @@
-// Tracks articles taken off the homepage so the "Ultime notizie" column can
-// list the most recently removed first.
+// Tracks articles taken off the homepage, with the time they were removed, so
+// the "Ultime notizie" column can put the latest arrivals on top.
 
 export const HOMEPAGE_SLOT_FIELDS = [
   'lead',
@@ -17,15 +17,15 @@ interface Ref {
   _ref: string
 }
 
-export interface HistoryRef {
-  _type: 'reference'
-  _ref: string
+export interface RemovedEntry {
+  _type: 'removedArticle'
   _key: string
-  _weak?: boolean
+  article: { _type: 'reference'; _ref: string; _weak: true }
+  removedAt: string
 }
 
 type HomepageDoc = Partial<Record<(typeof HOMEPAGE_SLOT_FIELDS)[number], Ref | undefined>> & {
-  recentlyRemoved?: HistoryRef[]
+  recentlyRemoved?: RemovedEntry[]
 }
 
 function slotIds(doc: HomepageDoc | null | undefined): string[] {
@@ -33,26 +33,28 @@ function slotIds(doc: HomepageDoc | null | undefined): string[] {
   return HOMEPAGE_SLOT_FIELDS.map((field) => doc[field]?._ref).filter((id): id is string => Boolean(id))
 }
 
+function entry(id: string, removedAt: string): RemovedEntry {
+  return {
+    _type: 'removedArticle',
+    _key: id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20) || 'k',
+    // Weak so a deleted article never blocks publishing the homepage.
+    article: { _type: 'reference', _ref: id, _weak: true },
+    removedAt,
+  }
+}
+
 // Returns the new history, or null when nothing changed.
 export function nextRemovedHistory(
   published: HomepageDoc | null | undefined,
-  draft: HomepageDoc | null | undefined
-): HistoryRef[] | null {
+  draft: HomepageDoc | null | undefined,
+  now: string
+): RemovedEntry[] | null {
   const current = new Set(slotIds(draft))
   const removed = slotIds(published).filter((id) => !current.has(id))
-  const previous = (draft?.recentlyRemoved ?? published?.recentlyRemoved ?? []).map((ref) => ref._ref)
+  const previous = draft?.recentlyRemoved ?? published?.recentlyRemoved ?? []
+  const kept = previous.filter((item) => !current.has(item.article._ref) && !removed.includes(item.article._ref))
 
-  const seen = new Set<string>()
-  const ids = [...removed, ...previous].filter((id) => {
-    if (current.has(id) || seen.has(id)) return false
-    seen.add(id)
-    return true
-  })
-  const limited = ids.slice(0, REMOVED_HISTORY_LIMIT)
+  if (removed.length === 0 && kept.length === previous.length) return null
 
-  if (removed.length === 0 && limited.length === previous.length && limited.every((id, i) => id === previous[i])) {
-    return null
-  }
-  // Weak references so a deleted article never blocks publishing the homepage.
-  return limited.map((id) => ({ _type: 'reference', _ref: id, _key: id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 20) || 'k', _weak: true }))
+  return [...removed.map((id) => entry(id, now)), ...kept].slice(0, REMOVED_HISTORY_LIMIT)
 }

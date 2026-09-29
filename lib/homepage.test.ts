@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickWithManual } from './homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickManualOnly, buildLatestFeed } from './homepage'
 import type { ArticleSummary, Category } from './sanity/types'
 
 function makeCategory(name: string, slug: string): Category {
@@ -174,14 +174,40 @@ describe('pickCategoryBoxes with manual picks', () => {
   })
 })
 
-describe('pickWithManual', () => {
-  it('puts editor picks first, then fills with the newest unshown articles', () => {
-    const [a, b, c] = ['a', 'b', 'c'].map((id) => makeArticle(id, 'poltrone'))
-    expect(pickWithManual([null, c], [a, b, c], [], 2).map((x) => x._id)).toEqual(['c', 'a'])
+function at(id: string, publishedAt: string): ArticleSummary {
+  return { ...makeArticle(id, 'come-campiamo'), publishedAt }
+}
+
+describe('pickManualOnly', () => {
+  it('keeps positions, leaving empty ones empty instead of auto-filling', () => {
+    const a = makeArticle('a', 'poltrone')
+    expect(pickManualOnly([null, a], [], 2).map((x) => x?._id ?? null)).toEqual([null, 'a'])
   })
 
-  it('skips picks already shown above and repeated picks', () => {
-    const [a, b, c] = ['a', 'b', 'c'].map((id) => makeArticle(id, 'poltrone'))
-    expect(pickWithManual([a, b, b], [a, b, c], [a], 2).map((x) => x._id)).toEqual(['b', 'c'])
+  it('empties a position whose article is already shown above', () => {
+    const a = makeArticle('a', 'poltrone')
+    expect(pickManualOnly([a, a], [a], 2)).toEqual([null, null])
+  })
+})
+
+describe('buildLatestFeed', () => {
+  const SINCE = '2026-09-29T00:00:00.000Z'
+
+  it('puts a new unplaced article on top', () => {
+    const fresh = at('fresh', '2026-09-29T17:40:00.000Z')
+    const earlier = at('earlier', '2026-09-29T16:00:00.000Z')
+    expect(buildLatestFeed([], [fresh, earlier], [], SINCE, 10).map((x) => x._id)).toEqual(['fresh', 'earlier'])
+  })
+
+  it('puts an article just removed from the homepage above newer publications', () => {
+    const fresh = at('fresh', '2026-09-29T17:40:00.000Z')
+    const removed = { article: at('removed', '2026-09-24T10:00:00.000Z'), removedAt: '2026-09-29T18:00:00.000Z' }
+    expect(buildLatestFeed([removed], [fresh], [], SINCE, 10).map((x) => x._id)).toEqual(['removed', 'fresh'])
+  })
+
+  it('leaves out articles shown above and old articles never removed', () => {
+    const shown = at('shown', '2026-09-29T17:00:00.000Z')
+    const old = at('old', '2026-09-24T10:00:00.000Z')
+    expect(buildLatestFeed([], [shown, old], [shown], SINCE, 10)).toEqual([])
   })
 })

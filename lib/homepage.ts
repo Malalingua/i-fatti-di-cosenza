@@ -79,24 +79,49 @@ export function pickCategoryBoxes(
   })
 }
 
-// Editor picks first (skipping any already shown or repeated), then the
-// newest unshown articles fill the remaining places.
-export function pickWithManual(
+// Editor picks only: one entry per position, null when the position is empty
+// or its article is already shown elsewhere on the page.
+export function pickManualOnly(
   manual: (ArticleSummary | null)[],
+  shown: (ArticleSummary | null)[],
+  size: number
+): (ArticleSummary | null)[] {
+  const shownIds = new Set(shown.map((article) => article?._id))
+  return Array.from({ length: size }, (_, i) => {
+    const article = manual[i]
+    if (!article || shownIds.has(article._id)) return null
+    shownIds.add(article._id)
+    return article
+  })
+}
+
+// "Ultime notizie": articles taken off the homepage plus new articles never
+// placed on it, ordered by when they arrived in the column (removal or
+// publish time), latest first. Articles published before `since` only appear
+// once they have been removed from the homepage.
+export function buildLatestFeed(
+  removed: { removedAt: string; article: ArticleSummary }[],
   latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],
+  since: string,
   limit: number
 ): ArticleSummary[] {
   const shownIds = new Set(shown.map((article) => article?._id))
-  const picks: ArticleSummary[] = []
-  for (const article of manual) {
-    if (article && !shownIds.has(article._id) && picks.length < limit) {
-      shownIds.add(article._id)
-      picks.push(article)
-    }
+  const arrivals = new Map<string, { article: ArticleSummary; at: number }>()
+  const add = (article: ArticleSummary, at: string) => {
+    if (shownIds.has(article._id)) return
+    const time = new Date(at).getTime()
+    const existing = arrivals.get(article._id)
+    if (!existing || time > existing.at) arrivals.set(article._id, { article, at: time })
   }
-  const rest = latest.filter((article) => !shownIds.has(article._id)).slice(0, limit - picks.length)
-  return [...picks, ...rest]
+  for (const item of removed) add(item.article, item.removedAt)
+  for (const article of latest) {
+    if (new Date(article.publishedAt) >= new Date(since)) add(article, article.publishedAt)
+  }
+  return [...arrivals.values()]
+    .sort((a, b) => b.at - a.at)
+    .slice(0, limit)
+    .map((item) => item.article)
 }
 
 export function pickOtherNews(
