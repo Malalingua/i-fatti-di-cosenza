@@ -6,7 +6,7 @@ import { Ticker } from '@/components/Ticker'
 import { LatestNews } from '@/components/LatestNews'
 import type { SectionColor } from '@/components/SectionBar'
 import { LEAD_SECTION_TITLE } from '@/lib/constants'
-import { pickCategoryBoxes, pickOtherNews } from '@/lib/homepage'
+import { pickCategoryBoxes, pickOtherNews, pickWithManual } from '@/lib/homepage'
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 300
@@ -43,7 +43,7 @@ export default async function HomePage() {
     BOXES.map((box) => box.slug)
   )
   const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
-  const raccolta = pickOtherNews(latest, shownAbove, 2)
+  const raccolta = pickWithManual(homepage.raccolta, latest, shownAbove, 2)
   // Everything not already on the page, newest first: articles pushed out of
   // the lead or a box by a newer one drop down here automatically.
   const olderNews = pickOtherNews(latest, [...shownAbove, ...raccolta], 20)

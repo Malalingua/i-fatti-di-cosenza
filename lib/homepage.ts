@@ -79,6 +79,26 @@ export function pickCategoryBoxes(
   })
 }
 
+// Editor picks first (skipping any already shown or repeated), then the
+// newest unshown articles fill the remaining places.
+export function pickWithManual(
+  manual: (ArticleSummary | null)[],
+  latest: ArticleSummary[],
+  shown: (ArticleSummary | null)[],
+  limit: number
+): ArticleSummary[] {
+  const shownIds = new Set(shown.map((article) => article?._id))
+  const picks: ArticleSummary[] = []
+  for (const article of manual) {
+    if (article && !shownIds.has(article._id) && picks.length < limit) {
+      shownIds.add(article._id)
+      picks.push(article)
+    }
+  }
+  const rest = latest.filter((article) => !shownIds.has(article._id)).slice(0, limit - picks.length)
+  return [...picks, ...rest]
+}
+
 export function pickOtherNews(
   latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],

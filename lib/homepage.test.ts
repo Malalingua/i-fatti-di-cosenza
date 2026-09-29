@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes } from './homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickWithManual } from './homepage'
 import type { ArticleSummary, Category } from './sanity/types'
 
 function makeCategory(name: string, slug: string): Category {
@@ -171,5 +171,17 @@ describe('pickCategoryBoxes with manual picks', () => {
     const other = makeArticle('other', 'poltrone')
     const boxes = pickCategoryBoxes([[lead, other]], ['lead'], [lead], ['poltrone'])
     expect(boxes.map((a) => a?._id)).toEqual(['other'])
+  })
+})
+
+describe('pickWithManual', () => {
+  it('puts editor picks first, then fills with the newest unshown articles', () => {
+    const [a, b, c] = ['a', 'b', 'c'].map((id) => makeArticle(id, 'poltrone'))
+    expect(pickWithManual([null, c], [a, b, c], [], 2).map((x) => x._id)).toEqual(['c', 'a'])
+  })
+
+  it('skips picks already shown above and repeated picks', () => {
+    const [a, b, c] = ['a', 'b', 'c'].map((id) => makeArticle(id, 'poltrone'))
+    expect(pickWithManual([a, b, b], [a, b, c], [a], 2).map((x) => x._id)).toEqual(['b', 'c'])
   })
 })

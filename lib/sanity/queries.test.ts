@@ -41,7 +41,7 @@ describe('scheduled articles', () => {
   })
 
   it('homepage slots hide articles with a future publish date', () => {
-    for (const slot of ['lead', 'topLeft', 'topRight', 'bottomLeft', 'bottomRight']) {
+    for (const slot of ['lead', 'topLeft', 'topRight', 'bottomLeft', 'bottomRight', 'raccolta1', 'raccolta2']) {
       expect(homepageSlotsQuery).toContain(`${slot}->publishedAt <= now()`)
     }
   })
