@@ -44,9 +44,8 @@ export default async function HomePage() {
   )
   const shownAbove = [lead, ...boxArticles.filter((article): article is ArticleSummary => Boolean(article))]
   const raccolta = pickWithManual(homepage.raccolta, latest, shownAbove, 2)
-  // Articles most recently taken off the homepage come first, then everything
-  // else not already on the page, newest first.
-  const olderNews = pickWithManual(homepage.recentlyRemoved, latest, [...shownAbove, ...raccolta], 20)
+  // Only articles taken off the homepage, most recently removed first.
+  const olderNews = pickWithManual(homepage.recentlyRemoved, [], [...shownAbove, ...raccolta], 20)
   const tickerArticle = latest[0]
 
   // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and
