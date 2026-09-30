@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { ArticleSummary } from '@/lib/sanity/types'
 import { formatNewsTimestamp } from '@/lib/utils/date'
 import { ArticleTitle } from './ArticleTitle'
-import { SanityImage } from './SanityImage'
+import { CoverImage } from './CoverImage'
 import { SectionBar } from './SectionBar'
 
 export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
@@ -26,8 +26,8 @@ export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
                 )}
               </div>
               {article.coverImage && (
-                <div className="hidden w-32 shrink-0 sm:block">
-                  <SanityImage image={article.coverImage} alt={article.title} width={256} sizes="128px" />
+                <div className="relative hidden aspect-[4/3] w-32 shrink-0 overflow-hidden bg-neutral-100 sm:block">
+                  <CoverImage image={article.coverImage} alt={article.title} width={320} sizes="128px" />
                 </div>
               )}
             </Link>

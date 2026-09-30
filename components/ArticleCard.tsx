@@ -3,15 +3,15 @@ import { formatDate } from '@/lib/utils/date'
 import { truncateExcerpt } from '@/lib/utils/excerpt'
 import type { ArticleSummary } from '@/lib/sanity/types'
 import { CategoryBadge } from './CategoryBadge'
-import { SanityImage } from './SanityImage'
+import { CoverImage } from './CoverImage'
 
 export function ArticleCard({ article }: { article: ArticleSummary }) {
   const href = `/articolo/${article.slug}`
 
   return (
     <article className="flex flex-col gap-3">
-      <Link href={href} className="group block overflow-hidden rounded-lg">
-        <SanityImage
+      <Link href={href} className="group relative block aspect-video overflow-hidden rounded-lg bg-neutral-100">
+        <CoverImage
           image={article.coverImage}
           alt={article.title}
           width={800}

@@ -30,3 +30,19 @@ export function hasImageAsset(source: SanityImageSource | null | undefined): boo
   const image = source as ImageWithMeta | null | undefined
   return Boolean(image?.asset?._ref || image?.asset?._id)
 }
+
+// CSS object-position that keeps the hotspot (the "punto focale" set in the
+// Studio) in view when a photo is cut to fill a fixed box. The hotspot is
+// stored relative to the original photo, so it is shifted into the cropped area.
+export function hotspotPosition(source: SanityImageSource | null | undefined): string {
+  const image = source as (ImageWithMeta & { hotspot?: { x?: number; y?: number } }) | null | undefined
+  const hotspot = image?.hotspot
+  if (hotspot?.x === undefined || hotspot?.y === undefined) return '50% 50%'
+  const crop = image?.crop ?? {}
+  const left = crop.left ?? 0
+  const top = crop.top ?? 0
+  const width = 1 - left - (crop.right ?? 0)
+  const height = 1 - top - (crop.bottom ?? 0)
+  const clamp = (value: number) => Math.min(100, Math.max(0, Math.round(value * 1000) / 10))
+  return `${clamp((hotspot.x - left) / width)}% ${clamp((hotspot.y - top) / height)}%`
+}

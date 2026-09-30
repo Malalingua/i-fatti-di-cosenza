@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('./client', () => ({ client: { config: () => ({ projectId: 'p', dataset: 'd' }) } }))
 
-import { hasImageAsset, imageDimensions } from './image'
+import { hasImageAsset, hotspotPosition, imageDimensions } from './image'
 
 describe('imageDimensions', () => {
   it('reads the original size from the asset id', () => {
@@ -28,5 +28,20 @@ describe('hasImageAsset', () => {
 
   it('is true once a photo is uploaded', () => {
     expect(hasImageAsset({ asset: { _ref: 'image-abc-10x10-jpg' } })).toBe(true)
+  })
+})
+
+describe('hotspotPosition', () => {
+  it('centres the photo when no focal point is set', () => {
+    expect(hotspotPosition({ asset: { _ref: 'image-a-10x10-jpg' } })).toBe('50% 50%')
+  })
+
+  it('uses the focal point set in the Studio', () => {
+    expect(hotspotPosition({ asset: { _ref: 'image-a-10x10-jpg' }, hotspot: { x: 0.3, y: 0.2 } } as never)).toBe('30% 20%')
+  })
+
+  it('shifts the focal point into the cropped area', () => {
+    const image = { asset: { _ref: 'image-a-10x10-jpg' }, crop: { left: 0.2, right: 0.2, top: 0, bottom: 0 }, hotspot: { x: 0.5, y: 0.5 } }
+    expect(hotspotPosition(image as never)).toBe('50% 50%')
   })
 })

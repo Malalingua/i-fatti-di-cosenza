@@ -84,21 +84,21 @@ export default async function HomePage() {
   const olderNews = buildLatestFeed(removed, latest, shownArticles(layout), FEED_RESET, 20)
   const tickerArticle = latest[0]
 
-  // Two independent columns, as in the template: left = lead + Carta canta,
-  // right = Come campiamo and Poltrone side by side + Tribunali. Empty boxes
-  // are hidden; a lone top box takes the full column width, with its photo
-  // beside the text so it does not grow too tall.
-  const [comeCampiamo, poltrone, , tribunali] = boxArticles
+  // Two aligned rows, as in the template: lead | Come campiamo + Poltrone,
+  // then Carta canta | Tribunali. Boxes in a row share its height, so there
+  // are no gaps. Empty boxes are hidden and their neighbour widens.
+  const [comeCampiamo, poltrone, cartaCanta, tribunali] = boxArticles
   const topPairAlone = Boolean(comeCampiamo) !== Boolean(poltrone)
-  const rightColumnEmpty = !comeCampiamo && !poltrone && !tribunali
+  const hasTopPair = Boolean(comeCampiamo || poltrone)
+  const bottomAlone = Boolean(cartaCanta) !== Boolean(tribunali)
 
-  const renderBox = (index: number, wide = false) => {
+  const renderBox = (index: number, className = '', layout?: 'stacked' | 'side') => {
     const box = BOXES[index]
     const article = boxArticles[index]
     if (!article) return null
     return (
-      <div key={box.slug} className={wide ? 'sm:col-span-2' : ''}>
-        <SecondaryArticle article={article} title={box.title} color={box.color} layout={wide ? 'side' : box.layout} />
+      <div key={box.slug} className={className}>
+        <SecondaryArticle article={article} title={box.title} color={box.color} layout={layout ?? box.layout} />
       </div>
     )
   }
@@ -107,22 +107,18 @@ export default async function HomePage() {
     <main className="mx-auto max-w-6xl px-4 py-4">
       {tickerArticle && <Ticker article={tickerArticle} />}
 
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
-        <div className={`flex flex-col gap-4 ${rightColumnEmpty ? 'lg:col-span-2' : ''}`}>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className={hasTopPair ? '' : 'lg:col-span-2'}>
           <FeaturedArticle article={lead} title={homepage.leadTitle ?? LEAD_SECTION_TITLE} />
-          {renderBox(2)}
         </div>
-        {!rightColumnEmpty && (
-          <div className="flex flex-col gap-4">
-            {(comeCampiamo || poltrone) && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {renderBox(0, topPairAlone)}
-                {renderBox(1, topPairAlone)}
-              </div>
-            )}
-            {renderBox(3)}
+        {hasTopPair && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {renderBox(0, topPairAlone ? 'sm:col-span-2' : '', topPairAlone ? 'side' : undefined)}
+            {renderBox(1, topPairAlone ? 'sm:col-span-2' : '', topPairAlone ? 'side' : undefined)}
           </div>
         )}
+        {renderBox(2, bottomAlone ? 'lg:col-span-2' : '')}
+        {renderBox(3, bottomAlone ? 'lg:col-span-2' : '')}
       </div>
 
       <RaccoltaIndifferenziata articles={raccolta} />

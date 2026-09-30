@@ -1,11 +1,11 @@
 import Link from 'next/link'
 import type { ArticleSummary } from '@/lib/sanity/types'
 import { ArticleTitle } from './ArticleTitle'
-import { SanityImage } from './SanityImage'
+import { CoverImage } from './CoverImage'
 import { SectionBar } from './SectionBar'
 
-// The two editor picks, each with its photo on top. Empty positions are left
-// out; with no picks the section is not shown.
+// The two editor picks, each with its photo on top at the same 16:9 format.
+// Empty positions are left out; with no picks the section is not shown.
 export function RaccoltaIndifferenziata({ articles }: { articles: (ArticleSummary | null)[] }) {
   const picks = articles.filter((article): article is ArticleSummary => Boolean(article))
   if (picks.length === 0) return null
@@ -20,16 +20,18 @@ export function RaccoltaIndifferenziata({ articles }: { articles: (ArticleSummar
           <Link
             key={article._id}
             href={`/articolo/${article.slug}`}
-            className="group block border border-neutral-300 bg-white p-2 hover:bg-neutral-50"
+            className="group block h-full border border-neutral-300 bg-white p-2 hover:bg-neutral-50"
           >
             {article.coverImage && (
-              <SanityImage
-                image={article.coverImage}
-                alt={article.title}
-                width={1000}
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className="transition-opacity group-hover:opacity-90"
-              />
+              <div className="relative aspect-video overflow-hidden bg-neutral-100">
+                <CoverImage
+                  image={article.coverImage}
+                  alt={article.title}
+                  width={1000}
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="transition-opacity group-hover:opacity-90"
+                />
+              </div>
             )}
             <ArticleTitle title={article.title} className="mt-3 text-xl" />
             {article.excerpt && <p className="mt-1 font-display text-sm text-neutral-700 line-clamp-3">{article.excerpt}</p>}
