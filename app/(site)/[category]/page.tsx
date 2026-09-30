@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { getAllCategories, getCategoryArticles } from '@/lib/sanity/queries'
 import { ArticleCard } from '@/components/ArticleCard'
 
-export const revalidate = 300
+export const revalidate = 60
 const PAGE_SIZE = 12
 
 export async function generateStaticParams() {
