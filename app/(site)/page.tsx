@@ -86,23 +86,21 @@ export default async function HomePage() {
   const olderNews = buildLatestFeed(removed, shownArticles(layout), 20)
   const tickerArticle = latest[0]
 
-  // Boxes come in pairs (top: 0-1, bottom: 2-3). An empty box is hidden and
-  // its partner widens so the grid keeps the template's shape.
-  const partner = [1, 0, 3, 2]
-  const boxSpan = (index: number) => {
-    const alone = !boxArticles[partner[index]]
-    if (index < 2) return alone ? 'md:col-span-2' : ''
-    return alone ? 'md:col-span-2 lg:col-span-4' : 'md:col-span-2'
-  }
-  const leadSpan = boxArticles[0] || boxArticles[1] ? 'md:col-span-2' : 'md:col-span-2 lg:col-span-4'
+  // Two independent columns, as in the template: left = lead + Carta canta,
+  // right = Come campiamo and Poltrone side by side + Tribunali. Empty boxes
+  // are hidden; a lone top box takes the full column width, with its photo
+  // beside the text so it does not grow too tall.
+  const [comeCampiamo, poltrone, , tribunali] = boxArticles
+  const topPairAlone = Boolean(comeCampiamo) !== Boolean(poltrone)
+  const rightColumnEmpty = !comeCampiamo && !poltrone && !tribunali
 
-  const renderBox = (index: number) => {
+  const renderBox = (index: number, wide = false) => {
     const box = BOXES[index]
     const article = boxArticles[index]
     if (!article) return null
     return (
-      <div key={box.slug} className={boxSpan(index)}>
-        <SecondaryArticle article={article} title={box.title} color={box.color} layout={box.layout} />
+      <div key={box.slug} className={wide ? 'sm:col-span-2' : ''}>
+        <SecondaryArticle article={article} title={box.title} color={box.color} layout={wide ? 'side' : box.layout} />
       </div>
     )
   }
@@ -111,14 +109,22 @@ export default async function HomePage() {
     <main className="mx-auto max-w-6xl px-4 py-4">
       {tickerArticle && <Ticker article={tickerArticle} />}
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className={leadSpan}>
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+        <div className={`flex flex-col gap-4 ${rightColumnEmpty ? 'lg:col-span-2' : ''}`}>
           <FeaturedArticle article={lead} title={homepage.leadTitle ?? LEAD_SECTION_TITLE} />
+          {renderBox(2)}
         </div>
-        {renderBox(0)}
-        {renderBox(1)}
-        {renderBox(2)}
-        {renderBox(3)}
+        {!rightColumnEmpty && (
+          <div className="flex flex-col gap-4">
+            {(comeCampiamo || poltrone) && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {renderBox(0, topPairAlone)}
+                {renderBox(1, topPairAlone)}
+              </div>
+            )}
+            {renderBox(3)}
+          </div>
+        )}
       </div>
 
       <RaccoltaIndifferenziata articles={raccolta} />
