@@ -10,7 +10,7 @@ describe('Header', () => {
   it('renders a link for each of the 6 fixed categories', () => {
     render(<Header />)
     const expected = [
-      ["Nessuno l'ha mai chiesto", '/intervista-sincera'],
+      ["Nessuno l'ha mai chiesto", '/nessuno-l-ha-mai-chiesto'],
       ['Poltrone & Potere', '/poltrone'],
       ['Tribunali e tribolazioni', '/tribunali-e-tribolazioni'],
       ['Come campiamo', '/come-campiamo'],

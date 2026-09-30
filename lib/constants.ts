@@ -1,7 +1,7 @@
 export const JOURNALIST_EMAIL = 'malalingua@libero.it'
 
 export const CATEGORIES = [
-  { name: "Nessuno l'ha mai chiesto", slug: 'intervista-sincera' },
+  { name: "Nessuno l'ha mai chiesto", slug: 'nessuno-l-ha-mai-chiesto' },
   { name: 'Poltrone & Potere', slug: 'poltrone' },
   { name: 'Tribunali e tribolazioni', slug: 'tribunali-e-tribolazioni' },
   { name: 'Come campiamo', slug: 'come-campiamo' },

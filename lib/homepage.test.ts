@@ -22,7 +22,7 @@ describe('sortCategoriesEditorially', () => {
   it('orders categories to match the fixed editorial order regardless of input order', () => {
     const input = [
       makeCategory('Carta canta', 'carta-canta'),
-      makeCategory("L'intervista sincera", 'intervista-sincera'),
+      makeCategory("L'intervista sincera", 'nessuno-l-ha-mai-chiesto'),
       makeCategory('Come campiamo', 'come-campiamo'),
       makeCategory('Italiani brava gente', 'italiani-brava-gente'),
       makeCategory('Poltrone & Potere', 'poltrone'),
@@ -30,7 +30,7 @@ describe('sortCategoriesEditorially', () => {
     ]
     const sorted = sortCategoriesEditorially(input)
     expect(sorted.map((c) => c.slug)).toEqual([
-      'intervista-sincera',
+      'nessuno-l-ha-mai-chiesto',
       'poltrone',
       'tribunali-e-tribolazioni',
       'come-campiamo',
@@ -43,10 +43,10 @@ describe('sortCategoriesEditorially', () => {
     const input = [
       makeCategory('Poltrone & Potere', 'poltrone'),
       makeCategory('Meteo', 'meteo'),
-      makeCategory("L'intervista sincera", 'intervista-sincera'),
+      makeCategory("L'intervista sincera", 'nessuno-l-ha-mai-chiesto'),
     ]
     const sorted = sortCategoriesEditorially(input)
-    expect(sorted.map((c) => c.slug)).toEqual(['intervista-sincera', 'poltrone', 'meteo'])
+    expect(sorted.map((c) => c.slug)).toEqual(['nessuno-l-ha-mai-chiesto', 'poltrone', 'meteo'])
   })
 })
 
