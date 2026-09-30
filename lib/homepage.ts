@@ -53,28 +53,19 @@ export function splitBriefs(
   return { top }
 }
 
-// One article per category box. A manual pick from the Homepage document wins
-// when it belongs to the box's category; otherwise the box shows the newest
-// article of that category not already shown. A box never shows an article
-// from another category: with nothing left in its category it stays empty.
-export function pickCategoryBoxes(
-  categoryLists: ArticleSummary[][],
-  excludeIds: string[],
-  manual: (ArticleSummary | null)[] = [],
-  boxSlugs: string[] = []
+// One article per box, only when chosen by hand in the Homepage document and
+// from the box's category. Nothing is filled in automatically: articles not
+// placed in a box go to "Titoli del giorno".
+export function pickManualBoxes(
+  manual: (ArticleSummary | null)[],
+  boxSlugs: string[],
+  excludeIds: string[]
 ): (ArticleSummary | undefined)[] {
   const seen = new Set(excludeIds)
-  const picks = categoryLists.map((_, i) => {
+  return boxSlugs.map((slug, i) => {
     const article = manual[i]
-    if (!article || seen.has(article._id)) return undefined
-    if (boxSlugs[i] && article.category?.slug !== boxSlugs[i]) return undefined
+    if (!article || seen.has(article._id) || article.category?.slug !== slug) return undefined
     seen.add(article._id)
-    return article
-  })
-  return picks.map((pick, i) => {
-    if (pick) return pick
-    const article = categoryLists[i].find((candidate) => !seen.has(candidate._id))
-    if (article) seen.add(article._id)
     return article
   })
 }
@@ -95,24 +86,34 @@ export function pickManualOnly(
   })
 }
 
-// "Ultime notizie": only articles replaced in a homepage box, most recently
-// replaced on top, whatever their publish date. Articles back on the homepage
-// are left out.
+// "Titoli del giorno": every article not on the homepage, latest arrival on
+// top. An article arrives when it is published without being placed in a box,
+// or when it is replaced in a box. Articles published before `since` only
+// appear once replaced.
 export function buildLatestFeed(
   removed: { removedAt: string; article: ArticleSummary }[],
+  latest: ArticleSummary[],
   shown: (ArticleSummary | null)[],
+  since: string,
   limit: number
 ): ArticleSummary[] {
   const shownIds = new Set(shown.map((article) => article?._id))
-  return [...removed]
-    .sort((a, b) => new Date(b.removedAt).getTime() - new Date(a.removedAt).getTime())
-    .map((item) => item.article)
-    .filter((article) => {
-      if (shownIds.has(article._id)) return false
-      shownIds.add(article._id)
-      return true
-    })
+  const arrivals = new Map<string, { article: ArticleSummary; at: number }>()
+  const add = (article: ArticleSummary, time: string) => {
+    if (shownIds.has(article._id)) return
+    const at = new Date(time).getTime()
+    const current = arrivals.get(article._id)
+    if (!current || at > current.at) arrivals.set(article._id, { article, at })
+  }
+  for (const item of removed) add(item.article, item.removedAt)
+  const start = new Date(since).getTime()
+  for (const article of latest) {
+    if (new Date(article.publishedAt).getTime() >= start) add(article, article.publishedAt)
+  }
+  return [...arrivals.values()]
+    .sort((a, b) => b.at - a.at)
     .slice(0, limit)
+    .map((item) => item.article)
 }
 
 export interface HomepagePicks {
@@ -124,7 +125,6 @@ export interface HomepagePicks {
 export interface HomepageSources {
   featured: ArticleSummary[]
   latest: ArticleSummary[]
-  categoryLists: ArticleSummary[][]
   boxSlugs: string[]
 }
 
@@ -134,12 +134,12 @@ export interface HomepageLayout {
   raccolta: (ArticleSummary | null)[]
 }
 
-// What the homepage actually shows for a set of editor picks, including the
-// automatic choices (featured/latest lead, newest article per category box).
+// What the homepage actually shows for a set of editor picks. Only the lead
+// has a fallback (the article flagged "In evidenza", else the newest).
 export function selectHomepage(picks: HomepagePicks, sources: HomepageSources): HomepageLayout | null {
   const lead = picks.lead ?? sources.featured[0] ?? sources.latest[0]
   if (!lead) return null
-  const boxes = pickCategoryBoxes(sources.categoryLists, [lead._id], picks.slots, sources.boxSlugs)
+  const boxes = pickManualBoxes(picks.slots, sources.boxSlugs, [lead._id])
   const above = [lead, ...boxes.filter((article): article is ArticleSummary => Boolean(article))]
   const raccolta = pickManualOnly(picks.raccolta, above, 2)
   return { lead, boxes, raccolta }
@@ -163,7 +163,6 @@ export function sourcesAt(pool: ArticleSummary[], boxSlugs: string[], time: stri
   return {
     featured: live.filter((article) => article.featured),
     latest: live,
-    categoryLists: boxSlugs.map((slug) => live.filter((article) => article.category?.slug === slug)),
     boxSlugs,
   }
 }

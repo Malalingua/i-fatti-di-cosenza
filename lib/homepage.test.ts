@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickCategoryBoxes, pickManualOnly, buildLatestFeed, selectHomepage, shownArticles, replacementsOverTime } from './homepage'
+import { sortCategoriesEditorially, selectLead, splitBriefs, pickOtherNews, pickManualBoxes, pickManualOnly, buildLatestFeed, selectHomepage, shownArticles, replacementsOverTime } from './homepage'
 import type { ArticleSummary, Category } from './sanity/types'
 
 function makeCategory(name: string, slug: string): Category {
@@ -124,53 +124,23 @@ describe('pickOtherNews', () => {
   })
 })
 
-describe('pickCategoryBoxes', () => {
-  it('picks the newest article of each category, skipping excluded ids', () => {
-    const lead = makeArticle('lead', 'come-campiamo')
+describe('pickManualBoxes', () => {
+  it('shows only the articles chosen by hand, one per box', () => {
     const cc = makeArticle('cc', 'come-campiamo')
     const pp = makeArticle('pp', 'poltrone')
-    const boxes = pickCategoryBoxes([[lead, cc], [pp]], ['lead'])
-    expect(boxes.map((a) => a?._id)).toEqual(['cc', 'pp'])
+    expect(pickManualBoxes([cc, pp], ['come-campiamo', 'poltrone'], []).map((a) => a?._id)).toEqual(['cc', 'pp'])
   })
 
-  it('leaves a box empty rather than showing an article from another category', () => {
-    const pp = makeArticle('pp', 'poltrone')
-    const boxes = pickCategoryBoxes([[], [pp]], [])
-    expect(boxes.map((a) => a?._id)).toEqual([undefined, 'pp'])
+  it('leaves an unchosen box empty instead of filling it automatically', () => {
+    expect(pickManualBoxes([null], ['poltrone'], [])).toEqual([undefined])
   })
 
-  it('returns undefined when nothing is left to show', () => {
-    expect(pickCategoryBoxes([[]], [])).toEqual([undefined])
-  })
-})
-
-describe('pickCategoryBoxes with manual picks', () => {
-  it('uses the manual pick for its box instead of the newest article', () => {
-    const newest = makeArticle('newest', 'come-campiamo')
-    const chosen = makeArticle('chosen', 'come-campiamo')
-    const boxes = pickCategoryBoxes([[newest, chosen]], [], [chosen], ['come-campiamo'])
-    expect(boxes.map((a) => a?._id)).toEqual(['chosen'])
-  })
-
-  it('does not reuse a manual pick in another box', () => {
-    const chosen = makeArticle('chosen', 'poltrone')
-    const other = makeArticle('other', 'poltrone')
-    const boxes = pickCategoryBoxes([[chosen, other], [chosen, other]], [], [null, chosen], ['poltrone', 'poltrone'])
-    expect(boxes.map((a) => a?._id)).toEqual(['other', 'chosen'])
-  })
-
-  it('ignores a manual pick from a different category', () => {
-    const wrong = makeArticle('wrong', 'come-campiamo')
-    const right = makeArticle('right', 'carta-canta')
-    const boxes = pickCategoryBoxes([[right]], [], [wrong], ['carta-canta'])
-    expect(boxes.map((a) => a?._id)).toEqual(['right'])
-  })
-
-  it('ignores a manual pick that is already the lead', () => {
+  it('ignores a pick from another category, the lead, or a repeat', () => {
     const lead = makeArticle('lead', 'poltrone')
-    const other = makeArticle('other', 'poltrone')
-    const boxes = pickCategoryBoxes([[lead, other]], ['lead'], [lead], ['poltrone'])
-    expect(boxes.map((a) => a?._id)).toEqual(['other'])
+    const wrong = makeArticle('wrong', 'come-campiamo')
+    const pp = makeArticle('pp', 'poltrone')
+    const boxes = pickManualBoxes([wrong, lead, pp, pp], ['poltrone', 'poltrone', 'poltrone', 'poltrone'], ['lead'])
+    expect(boxes.map((a) => a?._id)).toEqual([undefined, undefined, 'pp', undefined])
   })
 })
 
@@ -191,19 +161,24 @@ describe('pickManualOnly', () => {
 })
 
 describe('buildLatestFeed', () => {
-  it('orders by replacement time, latest replaced on top, whatever the publish date', () => {
-    const first = { article: at('first', '2026-09-29T10:00:00.000Z'), removedAt: '2026-09-29T17:50:00.000Z' }
-    const second = { article: at('second', '2026-09-20T10:00:00.000Z'), removedAt: '2026-09-29T18:00:00.000Z' }
-    expect(buildLatestFeed([first, second], [], 10).map((x) => x._id)).toEqual(['second', 'first'])
+  const SINCE = '2026-09-29T18:00:00.000Z'
+
+  it('lists a new article not placed in any box, newest on top', () => {
+    const older = at('older', '2026-09-30T16:00:00.000Z')
+    const newer = at('newer', '2026-09-30T17:00:00.000Z')
+    expect(buildLatestFeed([], [newer, older], [], SINCE, 10).map((x) => x._id)).toEqual(['newer', 'older'])
   })
 
-  it('is empty when nothing has been replaced yet', () => {
-    expect(buildLatestFeed([], [], 10)).toEqual([])
+  it('puts an article replaced in a box above one published earlier', () => {
+    const fresh = at('fresh', '2026-09-30T17:00:00.000Z')
+    const replaced = { article: at('replaced', '2026-09-20T10:00:00.000Z'), removedAt: '2026-09-30T18:00:00.000Z' }
+    expect(buildLatestFeed([replaced], [fresh], [], SINCE, 10).map((x) => x._id)).toEqual(['replaced', 'fresh'])
   })
 
-  it('leaves out an article that is back on the homepage', () => {
-    const a = at('a', '2026-09-29T10:00:00.000Z')
-    expect(buildLatestFeed([{ article: a, removedAt: '2026-09-29T18:00:00.000Z' }], [a], 10)).toEqual([])
+  it('leaves out articles on the homepage and old articles never replaced', () => {
+    const shown = at('shown', '2026-09-30T17:00:00.000Z')
+    const old = at('old', '2026-09-24T10:00:00.000Z')
+    expect(buildLatestFeed([], [shown, old], [shown], SINCE, 10)).toEqual([])
   })
 })
 
@@ -211,7 +186,6 @@ describe('selectHomepage', () => {
   const sources = (overrides: Partial<Parameters<typeof selectHomepage>[1]> = {}) => ({
     featured: [],
     latest: [],
-    categoryLists: [[]],
     boxSlugs: ['poltrone'],
     ...overrides,
   })
@@ -225,11 +199,11 @@ describe('selectHomepage', () => {
     expect(shownArticles(after).map((a) => a._id)).toEqual(['giudice'])
   })
 
-  it('lists the automatic box article as shown', () => {
+  it('does not fill an unchosen box with the newest article of its category', () => {
     const lead = makeArticle('lead', 'carta-canta')
-    const auto = makeArticle('auto', 'poltrone')
-    const layout = selectHomepage({ lead, slots: [null], raccolta: [] }, sources({ categoryLists: [[auto]] }))
-    expect(shownArticles(layout).map((a) => a._id)).toEqual(['lead', 'auto'])
+    const newest = makeArticle('newest', 'poltrone')
+    const layout = selectHomepage({ lead, slots: [null], raccolta: [] }, sources({ latest: [newest] }))
+    expect(shownArticles(layout).map((a) => a._id)).toEqual(['lead'])
   })
 })
 
@@ -259,14 +233,6 @@ describe('replacementsOverTime', () => {
     ]
     const result = replacementsOverTime(versions, [lead, rossi, prezzi], ['poltrone'], SINCE)
     expect(result).toEqual([{ id: 'rossi', removedAt: '2026-09-29T18:11:00.000Z' }])
-  })
-
-  it('records an automatic box article pushed out by a newer one in its category', () => {
-    const lead = art('lead', 'carta-canta', '2026-09-20T10:00:00.000Z', true)
-    const older = art('older', 'poltrone', '2026-09-21T10:00:00.000Z')
-    const newer = art('newer', 'poltrone', '2026-09-29T19:00:00.000Z')
-    const result = replacementsOverTime([{ time: SINCE, picks: noPicks }], [lead, older, newer], ['poltrone'], SINCE)
-    expect(result).toEqual([{ id: 'older', removedAt: '2026-09-29T19:00:00.000Z' }])
   })
 
   it('returns nothing without history', () => {

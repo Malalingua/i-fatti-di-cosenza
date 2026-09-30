@@ -1,6 +1,5 @@
 import {
   getArticlesByIds,
-  getCategoryArticles,
   getFeaturedArticles,
   getHomepageSlots,
   getLatestArticles,
@@ -38,15 +37,14 @@ const BOXES: { slug: string; title: string; color: SectionColor; layout: 'stacke
 ]
 
 export default async function HomePage() {
-  const [homepage, versions, featured, latest, ...categoryLists] = await Promise.all([
+  const [homepage, versions, featured, latest] = await Promise.all([
     getHomepageSlots(),
     getHomepageVersions(),
     getFeaturedArticles(10),
     getLatestArticles(30),
-    ...BOXES.map((box) => getCategoryArticles(box.slug, 1, 10)),
   ])
 
-  const sources: HomepageSources = { featured, latest, categoryLists, boxSlugs: BOXES.map((box) => box.slug) }
+  const sources: HomepageSources = { featured, latest, boxSlugs: BOXES.map((box) => box.slug) }
   const layout = selectHomepage(homepage, sources)
 
   if (!layout) {
@@ -64,7 +62,7 @@ export default async function HomePage() {
   const historyArticles = await getArticlesByIds(referencedIds(versions))
   const byId = new Map(historyArticles.map((article) => [article._id, article]))
   const resolve = (ref: { _ref?: string } | undefined) => (ref?._ref && byId.get(ref._ref)) || null
-  const pool = [...latest, ...featured, ...categoryLists.flat(), ...historyArticles]
+  const pool = [...latest, ...featured, ...historyArticles]
   const replacements = replacementsOverTime(
     versions.map(({ time, doc }) => ({
       time,
@@ -83,7 +81,7 @@ export default async function HomePage() {
     const article = replacedArticles.find((candidate) => candidate._id === replacement.id)
     return article ? [{ article, removedAt: replacement.removedAt }] : []
   })
-  const olderNews = buildLatestFeed(removed, shownArticles(layout), 20)
+  const olderNews = buildLatestFeed(removed, latest, shownArticles(layout), FEED_RESET, 20)
   const tickerArticle = latest[0]
 
   // Two independent columns, as in the template: left = lead + Carta canta,
