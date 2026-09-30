@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 
 vi.mock('./client', () => ({ client: { config: () => ({ projectId: 'p', dataset: 'd' }) } }))
 
-import { imageDimensions } from './image'
+import { hasImageAsset, imageDimensions } from './image'
 
 describe('imageDimensions', () => {
   it('reads the original size from the asset id', () => {
@@ -17,5 +17,16 @@ describe('imageDimensions', () => {
   it('returns null when the size is unknown', () => {
     expect(imageDimensions({ asset: { _ref: 'something-else' } })).toBeNull()
     expect(imageDimensions(null)).toBeNull()
+  })
+})
+
+describe('hasImageAsset', () => {
+  it('is false for an image block with no uploaded photo', () => {
+    expect(hasImageAsset({ _type: 'image', _key: 'k' } as never)).toBe(false)
+    expect(hasImageAsset(null)).toBe(false)
+  })
+
+  it('is true once a photo is uploaded', () => {
+    expect(hasImageAsset({ asset: { _ref: 'image-abc-10x10-jpg' } })).toBe(true)
   })
 })

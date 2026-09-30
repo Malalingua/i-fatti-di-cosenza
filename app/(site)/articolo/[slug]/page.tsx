@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getArticleBySlug, getCategoryArticles } from '@/lib/sanity/queries'
-import { urlForImage } from '@/lib/sanity/image'
+import { hasImageAsset, urlForImage } from '@/lib/sanity/image'
 import { formatDate } from '@/lib/utils/date'
 import { CategoryBadge } from '@/components/CategoryBadge'
 import { ArticleCard } from '@/components/ArticleCard'
@@ -13,11 +13,11 @@ export const revalidate = 60
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await getArticleBySlug(params.slug)
   if (!article) return {}
-  const imageUrl = urlForImage(article.coverImage).width(1200).height(630).url()
+  const imageUrl = hasImageAsset(article.coverImage) ? urlForImage(article.coverImage).width(1200).height(630).url() : undefined
   return {
     title: article.title,
     description: article.excerpt ?? undefined,
-    openGraph: { title: article.title, description: article.excerpt ?? undefined, images: [imageUrl] },
+    openGraph: { title: article.title, description: article.excerpt ?? undefined, images: imageUrl ? [imageUrl] : [] },
   }
 }
 
@@ -31,7 +31,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: article.title,
-    image: [urlForImage(article.coverImage).width(1200).height(630).url()],
+    image: hasImageAsset(article.coverImage) ? [urlForImage(article.coverImage).width(1200).height(630).url()] : [],
     datePublished: article.publishedAt,
     author: [{ '@type': 'Person', name: article.author.name }],
   }

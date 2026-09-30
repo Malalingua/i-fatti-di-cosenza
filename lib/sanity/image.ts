@@ -25,3 +25,8 @@ export function imageDimensions(source: SanityImageSource | null | undefined): {
   const height = Math.round(Number(match[2]) * (1 - (crop.top ?? 0) - (crop.bottom ?? 0)))
   return width > 0 && height > 0 ? { width, height } : null
 }
+
+export function hasImageAsset(source: SanityImageSource | null | undefined): boolean {
+  const image = source as ImageWithMeta | null | undefined
+  return Boolean(image?.asset?._ref || image?.asset?._id)
+}

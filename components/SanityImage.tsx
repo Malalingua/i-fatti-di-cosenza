@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
-import { imageDimensions, urlForImage } from '@/lib/sanity/image'
+import { hasImageAsset, imageDimensions, urlForImage } from '@/lib/sanity/image'
 
 interface SanityImageProps {
   image: SanityImageSource
@@ -14,6 +14,8 @@ interface SanityImageProps {
 // Shows an uploaded photo whole, at its own proportions (after any crop made
 // in the Studio), never cut to fit a fixed box.
 export function SanityImage({ image, alt, width, sizes, className = '', priority }: SanityImageProps) {
+  // An image block added in the Studio without uploading a photo has no asset.
+  if (!hasImageAsset(image)) return null
   const size = imageDimensions(image) ?? { width: 4, height: 3 }
   return (
     <Image
