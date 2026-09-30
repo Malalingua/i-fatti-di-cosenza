@@ -30,7 +30,7 @@ export const homepage = defineType({
     {
       name: 'raccolta',
       title: 'Raccolta indifferenziata',
-      description: 'Scegli i due articoli di “Le malelingue del web”. Un box vuoto resta vuoto.',
+      description: 'Scegli fino a due articoli di “Le malelingue del web”. Un campo vuoto non compare sul sito.',
       options: { columns: 2 },
     },
   ],
