@@ -16,12 +16,12 @@ export function FeaturedArticle({ article, title }: FeaturedArticleProps) {
       <Link href={`/articolo/${article.slug}`} className="group relative block min-h-[26rem] flex-1 overflow-hidden bg-neutral-900">
         {article.coverImage && (
           <Image
-            src={urlForImage(article.coverImage).width(1000).height(1100).url()}
+            src={urlForImage(article.coverImage).width(1200).fit('max').url()}
             alt={article.title}
             fill
             priority
             sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-cover transition-opacity group-hover:opacity-90"
+            className="object-contain object-top transition-opacity group-hover:opacity-90"
           />
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent px-5 pb-5 pt-24 text-white">

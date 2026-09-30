@@ -8,7 +8,8 @@ vi.mock('next/image', () => ({
 }))
 
 vi.mock('@/lib/sanity/image', () => ({
-  urlForImage: () => ({ width: () => ({ height: () => ({ url: () => 'https://cdn.sanity.io/test.jpg' }) }) }),
+  urlForImage: () => ({ width: () => ({ fit: () => ({ url: () => 'https://cdn.sanity.io/test.jpg' }) }) }),
+  imageDimensions: () => ({ width: 1200, height: 800 }),
 }))
 
 const article: ArticleSummary = {

@@ -1,8 +1,7 @@
 import { PortableText, type PortableTextBlock } from '@portabletext/react'
-import Image from 'next/image'
 import Link from 'next/link'
-import { urlForImage } from '@/lib/sanity/image'
 import { urlForFile, getVideoEmbedUrl } from '@/lib/sanity/file'
+import { SanityImage } from './SanityImage'
 
 export function PortableTextRenderer({ value }: { value: PortableTextBlock[] }) {
   return (
@@ -12,11 +11,10 @@ export function PortableTextRenderer({ value }: { value: PortableTextBlock[] }) 
         components={{
           types: {
             image: ({ value: imageValue }) => (
-              <Image
-                src={urlForImage(imageValue).width(1200).url()}
+              <SanityImage
+                image={imageValue}
                 alt={imageValue.alt || ''}
-                width={1200}
-                height={675}
+                width={1600}
                 sizes="(max-width: 768px) 100vw, 768px"
                 className="rounded-lg"
               />

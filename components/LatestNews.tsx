@@ -1,9 +1,8 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import { urlForImage } from '@/lib/sanity/image'
 import type { ArticleSummary } from '@/lib/sanity/types'
 import { formatNewsTimestamp } from '@/lib/utils/date'
 import { ArticleTitle } from './ArticleTitle'
+import { SanityImage } from './SanityImage'
 import { SectionBar } from './SectionBar'
 
 export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
@@ -27,14 +26,8 @@ export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
                 )}
               </div>
               {article.coverImage && (
-                <div className="relative hidden aspect-[4/3] w-32 shrink-0 overflow-hidden sm:block">
-                  <Image
-                    src={urlForImage(article.coverImage).width(256).height(192).url()}
-                    alt={article.title}
-                    fill
-                    sizes="128px"
-                    className="object-cover"
-                  />
+                <div className="hidden w-32 shrink-0 sm:block">
+                  <SanityImage image={article.coverImage} alt={article.title} width={256} sizes="128px" />
                 </div>
               )}
             </Link>

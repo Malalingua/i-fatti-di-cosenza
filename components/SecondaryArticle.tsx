@@ -1,8 +1,7 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import { urlForImage } from '@/lib/sanity/image'
 import type { ArticleSummary } from '@/lib/sanity/types'
 import { ArticleTitle } from './ArticleTitle'
+import { SanityImage } from './SanityImage'
 import { SectionBar, type SectionColor } from './SectionBar'
 
 interface SecondaryArticleProps {
@@ -20,16 +19,16 @@ export function SecondaryArticle({ article, title, color, layout = 'stacked' }: 
       <SectionBar title={title} color={color} />
       <Link
         href={`/articolo/${article.slug}`}
-        className={`group flex flex-1 gap-3 p-2 ${side ? 'flex-col sm:flex-row' : 'flex-col'}`}
+        className={`group flex flex-1 gap-3 p-2 ${side ? 'flex-col sm:flex-row sm:items-start' : 'flex-col'}`}
       >
         {article.coverImage && (
-          <div className={`relative shrink-0 overflow-hidden ${side ? 'aspect-[4/3] sm:aspect-auto sm:w-1/2' : 'aspect-[4/3]'}`}>
-            <Image
-              src={urlForImage(article.coverImage).width(600).height(450).url()}
+          <div className={`shrink-0 ${side ? 'sm:w-1/2' : ''}`}>
+            <SanityImage
+              image={article.coverImage}
               alt={article.title}
-              fill
+              width={800}
               sizes="(min-width: 1024px) 25vw, 100vw"
-              className="object-cover transition-opacity group-hover:opacity-90"
+              className="transition-opacity group-hover:opacity-90"
             />
           </div>
         )}

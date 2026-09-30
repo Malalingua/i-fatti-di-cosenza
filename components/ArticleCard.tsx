@@ -1,23 +1,22 @@
-import Image from 'next/image'
 import Link from 'next/link'
-import { urlForImage } from '@/lib/sanity/image'
 import { formatDate } from '@/lib/utils/date'
 import { truncateExcerpt } from '@/lib/utils/excerpt'
 import type { ArticleSummary } from '@/lib/sanity/types'
 import { CategoryBadge } from './CategoryBadge'
+import { SanityImage } from './SanityImage'
 
 export function ArticleCard({ article }: { article: ArticleSummary }) {
   const href = `/articolo/${article.slug}`
 
   return (
     <article className="flex flex-col gap-3">
-      <Link href={href} className="group relative block aspect-video overflow-hidden rounded-lg">
-        <Image
-          src={urlForImage(article.coverImage).width(600).height(338).url()}
+      <Link href={href} className="group block overflow-hidden rounded-lg">
+        <SanityImage
+          image={article.coverImage}
           alt={article.title}
-          fill
+          width={800}
           sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-          className="object-cover transition-transform group-hover:scale-105"
+          className="transition-transform group-hover:scale-105"
         />
       </Link>
       <CategoryBadge name={article.category.name} accentColor={article.category.accentColor} />
