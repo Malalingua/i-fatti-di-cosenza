@@ -15,14 +15,25 @@ export function FeaturedArticle({ article, title }: FeaturedArticleProps) {
       <SectionBar title={title} color="red" />
       <Link href={`/articolo/${article.slug}`} className="group relative block min-h-[26rem] flex-1 overflow-hidden bg-neutral-900">
         {article.coverImage && (
-          <Image
-            src={urlForImage(article.coverImage).width(1200).fit('max').url()}
-            alt={article.title}
-            fill
-            priority
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            className="object-contain object-top transition-opacity group-hover:opacity-90"
-          />
+          <>
+            {/* The same photo, blurred, fills whatever space the whole photo leaves free. */}
+            <Image
+              src={urlForImage(article.coverImage).width(120).fit('max').url()}
+              alt=""
+              aria-hidden
+              fill
+              sizes="120px"
+              className="scale-125 object-cover blur-2xl brightness-75"
+            />
+            <Image
+              src={urlForImage(article.coverImage).width(1200).fit('max').url()}
+              alt={article.title}
+              fill
+              priority
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="object-contain object-top transition-opacity group-hover:opacity-90"
+            />
+          </>
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/80 to-transparent px-5 pb-5 pt-24 text-white">
           <h2 className="font-display text-3xl font-bold leading-tight md:text-4xl">{article.title}</h2>
