@@ -26,7 +26,7 @@ describe('ArticleCard', () => {
   it('renders title, excerpt, category, and date', () => {
     render(<ArticleCard article={article} />)
     expect(screen.getByText(article.title)).toBeInTheDocument()
-    expect(screen.getByText(article.excerpt)).toBeInTheDocument()
+    expect(screen.getByText(article.excerpt!)).toBeInTheDocument()
     expect(screen.getByText('Cronaca')).toBeInTheDocument()
     expect(screen.getByText('11 settembre 2026')).toBeInTheDocument()
   })
@@ -35,5 +35,13 @@ describe('ArticleCard', () => {
     render(<ArticleCard article={article} />)
     const links = screen.getAllByRole('link')
     expect(links.every((link) => link.getAttribute('href') === '/articolo/centro-storico-rifa-look')).toBe(true)
+  })
+})
+
+describe('ArticleCard without a summary', () => {
+  it('renders without an empty summary paragraph', () => {
+    const { container } = render(<ArticleCard article={{ ...article, excerpt: null }} />)
+    expect(screen.getByText(article.title)).toBeInTheDocument()
+    expect(container.querySelector('p.text-sm')).toBeNull()
   })
 })

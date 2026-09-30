@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   const imageUrl = urlForImage(article.coverImage).width(1200).height(630).url()
   return {
     title: article.title,
-    description: article.excerpt,
-    openGraph: { title: article.title, description: article.excerpt, images: [imageUrl] },
+    description: article.excerpt ?? undefined,
+    openGraph: { title: article.title, description: article.excerpt ?? undefined, images: [imageUrl] },
   }
 }
 

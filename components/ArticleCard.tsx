@@ -23,7 +23,7 @@ export function ArticleCard({ article }: { article: ArticleSummary }) {
       <Link href={href}>
         <h3 className="font-display text-xl font-bold leading-tight hover:underline">{article.title}</h3>
       </Link>
-      <p className="text-sm text-neutral-600">{truncateExcerpt(article.excerpt)}</p>
+      {article.excerpt && <p className="text-sm text-neutral-600">{truncateExcerpt(article.excerpt)}</p>}
       <time className="text-xs text-neutral-400" dateTime={article.publishedAt}>
         {formatDate(article.publishedAt)}
       </time>

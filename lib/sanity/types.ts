@@ -19,7 +19,7 @@ export interface ArticleSummary {
   _id: string
   title: string
   slug: string
-  excerpt: string
+  excerpt?: string | null
   coverImage: SanityImageSource
   publishedAt: string
   featured?: boolean

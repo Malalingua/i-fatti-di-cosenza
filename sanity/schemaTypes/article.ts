@@ -7,7 +7,14 @@ export const article = defineType({
   fields: [
     defineField({ name: 'title', title: 'Titolo', type: 'string', validation: (rule) => rule.required() }),
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'title' }, validation: (rule) => rule.required() }),
-    defineField({ name: 'excerpt', title: 'Sommario', type: 'text', rows: 3, validation: (rule) => rule.required().max(200) }),
+    defineField({
+      name: 'excerpt',
+      title: 'Sommario',
+      description: 'Facoltativo.',
+      type: 'text',
+      rows: 3,
+      validation: (rule) => rule.max(200),
+    }),
     defineField({
       name: 'coverImage',
       title: 'Immagine di copertina',
