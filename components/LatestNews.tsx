@@ -9,7 +9,7 @@ import { SectionBar } from './SectionBar'
 export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
   return (
     <section className="mt-6">
-      <SectionBar title="Ultime notizie" color="dark" />
+      <SectionBar title="Titoli del giorno" color="dark" />
       <ol className="divide-y divide-neutral-300 border-x border-b border-neutral-300 bg-white">
         {articles.map((article) => (
           <li key={article._id}>

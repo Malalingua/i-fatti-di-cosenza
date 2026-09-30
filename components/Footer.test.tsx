@@ -6,11 +6,11 @@ describe('Footer', () => {
   it('renders a link for each of the 6 fixed categories', () => {
     render(<Footer />)
     for (const name of [
-      "L'intervista sincera",
+      "Nessuno l'ha mai chiesto",
       'Poltrone & Potere',
       'Tribunali e tribolazioni',
       'Come campiamo',
-      'Italiani brava gente',
+      'Nera su bianco',
       'Carta canta',
     ]) {
       expect(screen.getByRole('link', { name })).toBeInTheDocument()

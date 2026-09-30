@@ -10,11 +10,11 @@ describe('Header', () => {
   it('renders a link for each of the 6 fixed categories', () => {
     render(<Header />)
     const expected = [
-      ["L'intervista sincera", '/intervista-sincera'],
+      ["Nessuno l'ha mai chiesto", '/intervista-sincera'],
       ['Poltrone & Potere', '/poltrone'],
       ['Tribunali e tribolazioni', '/tribunali-e-tribolazioni'],
       ['Come campiamo', '/come-campiamo'],
-      ['Italiani brava gente', '/italiani-brava-gente'],
+      ['Nera su bianco', '/italiani-brava-gente'],
       ['Carta canta', '/carta-canta'],
     ]
     for (const [name, href] of expected) {
