@@ -3,6 +3,8 @@ import { structureTool } from 'sanity/structure'
 import { visionTool } from '@sanity/vision'
 import { itITLocale } from '@sanity/locale-it-it'
 import { schemaTypes } from './sanity/schemaTypes'
+import { BulkDeleteArticles } from './sanity/components/BulkDeleteArticles'
+import { TrashIcon } from '@sanity/icons'
 
 const SINGLETON_TYPES = new Set(['homepage'])
 const SINGLETON_ACTIONS = new Set(['publish', 'discardChanges', 'restore'])
@@ -25,6 +27,12 @@ export default defineConfig({
               .child(S.document().schemaType('homepage').documentId('homepage')),
             S.divider(),
             ...S.documentTypeListItems().filter((item) => !SINGLETON_TYPES.has(item.getId() ?? '')),
+            S.divider(),
+            S.listItem()
+              .title('Elimina articoli')
+              .id('elimina-articoli')
+              .icon(TrashIcon)
+              .child(S.component(BulkDeleteArticles).id('elimina-articoli').title('Elimina articoli')),
           ]),
     }),
     visionTool(),
