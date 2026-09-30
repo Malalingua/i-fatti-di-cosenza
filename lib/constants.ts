@@ -16,8 +16,8 @@ export const ABOUT_TEXT =
   'Malalingua è un blog nato in Calabria. Pubblica domande, satira e documenti su politica, giustizia e vita quotidiana. Le domande sono rivolte a chi può rispondere; la satira prende di mira le contraddizioni del potere e dei costumi.'
 
 export const MASTHEAD = {
-  editor: 'Michele Santagata',
-  address: "via Ernesto d'Ippolito n. 46, Cosenza",
-  phone: '0984 845294',
+  address: 'Via Nicola Parisio, 6',
+  phone: '0984 25248',
   email: JOURNALIST_EMAIL,
+  whatsapp: '331 3808327',
 }

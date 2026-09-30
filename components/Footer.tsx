@@ -16,11 +16,21 @@ export function Footer() {
           </div>
           <div>
             <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-white">Gerenza</h2>
-            <p>A cura di {MASTHEAD.editor}</p>
             <p>Sede: {MASTHEAD.address}</p>
-            <p>Telefono: {MASTHEAD.phone}</p>
+            <p>
+              Telefono:{' '}
+              <a href={`tel:+39${MASTHEAD.phone.replace(/\s/g, '')}`} className="hover:text-white">
+                {MASTHEAD.phone}
+              </a>
+            </p>
             <p>
               Email: <a href={`mailto:${MASTHEAD.email}`} className="hover:text-white">{MASTHEAD.email}</a>
+            </p>
+            <p>
+              WhatsApp:{' '}
+              <a href={`https://wa.me/39${MASTHEAD.whatsapp.replace(/\s/g, '')}`} className="hover:text-white">
+                {MASTHEAD.whatsapp}
+              </a>
             </p>
           </div>
         </div>
