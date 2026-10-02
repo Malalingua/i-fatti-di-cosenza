@@ -8,6 +8,16 @@ export const article = defineType({
     defineField({ name: 'title', title: 'Titolo', type: 'string', validation: (rule) => rule.required() }),
     defineField({ name: 'slug', title: 'Slug', type: 'slug', options: { source: 'title' }, validation: (rule) => rule.required() }),
     defineField({
+      name: 'publishedAt',
+      title: 'Data e ora di pubblicazione',
+      type: 'datetime',
+      description:
+        'È la data mostrata sul sito. Puoi cambiarla quando vuoi: modifica e premi Pubblica (il sito si aggiorna entro 1 minuto). Con una data futura l’articolo resta nascosto fino a quell’ora.',
+      options: { dateFormat: 'DD/MM/YYYY', timeFormat: 'HH:mm', timeStep: 1 },
+      initialValue: () => new Date().toISOString(),
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
       name: 'excerpt',
       title: 'Sommario',
       description: 'Facoltativo.',
@@ -91,15 +101,6 @@ export const article = defineType({
       title: 'Autore',
       type: 'reference',
       to: [{ type: 'author' }],
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
-      name: 'publishedAt',
-      title: 'Data pubblicazione',
-      type: 'datetime',
-      description:
-        'Per programmare l’uscita imposta una data futura e premi Pubblica: l’articolo apparirà sul sito da quell’ora (entro 5 minuti).',
-      initialValue: () => new Date().toISOString(),
       validation: (rule) => rule.required(),
     }),
     defineField({
