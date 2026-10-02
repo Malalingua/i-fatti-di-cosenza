@@ -16,10 +16,18 @@ export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
         {articles.map((article) => (
           <li key={article._id}>
             <Link href={`/articolo/${article.slug}`} className="group flex gap-4 p-3 hover:bg-neutral-50">
-              <div className="w-20 shrink-0 pt-1 text-xs font-semibold text-neutral-500">
+              {article.coverImage && (
+                <div className="relative aspect-[4/3] w-24 shrink-0 overflow-hidden bg-neutral-100 sm:w-32">
+                  <CoverImage image={article.coverImage} alt={article.title} width={320} sizes="128px" />
+                </div>
+              )}
+              <div className="hidden w-20 shrink-0 pt-1 text-xs font-semibold text-neutral-500 sm:block">
                 <time dateTime={article.publishedAt}>{formatNewsTimestamp(article.publishedAt)}</time>
               </div>
               <div className="min-w-0 flex-1">
+                <time dateTime={article.publishedAt} className="block text-xs font-semibold text-neutral-500 sm:hidden">
+                  {formatNewsTimestamp(article.publishedAt)}
+                </time>
                 {article.category && (
                   <span className="text-xs font-bold uppercase tracking-wide text-[#d42a1c]">{article.category.name}</span>
                 )}
@@ -28,11 +36,6 @@ export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
                   <p className="mt-1 font-display text-sm text-neutral-700 line-clamp-2">{article.excerpt}</p>
                 )}
               </div>
-              {article.coverImage && (
-                <div className="relative hidden aspect-[4/3] w-32 shrink-0 overflow-hidden bg-neutral-100 sm:block">
-                  <CoverImage image={article.coverImage} alt={article.title} width={320} sizes="128px" />
-                </div>
-              )}
             </Link>
           </li>
         ))}
