@@ -98,7 +98,12 @@ export default async function HomePage() {
     if (!article) return null
     return (
       <div key={box.slug} className={className}>
-        <SecondaryArticle article={article} title={box.title} color={box.color} layout={layout ?? box.layout} />
+        <SecondaryArticle
+          article={article}
+          title={homepage.boxTitles[index] ?? box.title}
+          color={box.color}
+          layout={layout ?? box.layout}
+        />
       </div>
     )
   }

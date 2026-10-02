@@ -23,6 +23,7 @@ export const featuredArticlesQuery = `*[_type == "article" && featured == true &
 
 export const homepageSlotsQuery = `*[_type == "homepage" && _id == "homepage"][0]{
   leadTitle,
+  "boxTitles": [topLeftTitle, topRightTitle, bottomLeftTitle, bottomRightTitle],
   "lead": select(lead->publishedAt <= now() => lead->{ ${articleSummaryFields} }),
   "slots": [
     select(topLeft->publishedAt <= now() => topLeft->{ ${articleSummaryFields} }),
@@ -60,6 +61,7 @@ export async function getFeaturedArticles(limit: number): Promise<ArticleSummary
 
 export interface HomepageSelection {
   leadTitle: string | null
+  boxTitles: (string | null)[]
   lead: ArticleSummary | null
   slots: (ArticleSummary | null)[]
   raccolta: (ArticleSummary | null)[]
@@ -69,6 +71,7 @@ export async function getHomepageSlots(): Promise<HomepageSelection> {
   const result: Partial<HomepageSelection> | null = await client.fetch(homepageSlotsQuery)
   return {
     leadTitle: result?.leadTitle?.trim() || null,
+    boxTitles: (result?.boxTitles ?? []).map((title) => title?.trim() || null),
     lead: result?.lead ?? null,
     slots: result?.slots ?? [],
     raccolta: result?.raccolta ?? [],

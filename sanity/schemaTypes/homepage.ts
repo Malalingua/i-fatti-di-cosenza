@@ -15,6 +15,16 @@ const slot = (name: string, title: string, categorySlug: string) =>
     },
   })
 
+// The text in a box's coloured bar; empty keeps the category name.
+const barTitle = (name: string, categoryName: string) =>
+  defineField({
+    name,
+    title: 'Titolo barra',
+    description: `Se vuoto: “${categoryName}”.`,
+    type: 'string',
+    fieldset: 'boxes',
+  })
+
 export const homepage = defineType({
   name: 'homepage',
   title: 'Homepage',
@@ -48,9 +58,14 @@ export const homepage = defineType({
       type: 'reference',
       to: [{ type: 'article' }],
     }),
+    // Title and article side by side, one box per row.
+    barTitle('topLeftTitle', 'Come campiamo'),
     slot('topLeft', 'Come campiamo (verde)', 'come-campiamo'),
+    barTitle('topRightTitle', 'Poltrone & potere'),
     slot('topRight', 'Poltrone & potere (blu)', 'poltrone'),
+    barTitle('bottomLeftTitle', 'Carta canta'),
     slot('bottomLeft', 'Carta canta (rosso)', 'carta-canta'),
+    barTitle('bottomRightTitle', 'Tribunali e tribolazioni'),
     slot('bottomRight', 'Tribunali e tribolazioni (marrone)', 'tribunali-e-tribolazioni'),
     defineField({ name: 'raccolta1', title: '01', type: 'reference', to: [{ type: 'article' }], fieldset: 'raccolta' }),
     defineField({ name: 'raccolta2', title: '02', type: 'reference', to: [{ type: 'article' }], fieldset: 'raccolta' }),
