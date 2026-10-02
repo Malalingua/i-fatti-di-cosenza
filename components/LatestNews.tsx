@@ -8,7 +8,10 @@ import { SectionBar } from './SectionBar'
 export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
   return (
     <section className="mt-6">
-      <SectionBar title="Titoli del giorno" color="dark" />
+      <SectionBar title="Lingua Lunga" color="dark">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/lingua-lunga.png" alt="" aria-hidden="true" width={446} height={96} className="h-7 w-auto md:h-8" />
+      </SectionBar>
       <ol className="divide-y divide-neutral-300 border-x border-b border-neutral-300 bg-white">
         {articles.map((article) => (
           <li key={article._id}>

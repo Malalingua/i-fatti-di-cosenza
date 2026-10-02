@@ -34,7 +34,7 @@ export const homepage = defineType({
       name: 'boxes',
       title: 'Box del template',
       description:
-        'Scegli l’articolo per ogni box. Un box vuoto non compare. Gli articoli non scelti e quelli sostituiti vanno in “Titoli del giorno”.',
+        'Scegli l’articolo per ogni box. Un box vuoto non compare. Gli articoli non scelti e quelli sostituiti vanno in “Lingua Lunga”.',
       options: { columns: 2 },
     },
     {
