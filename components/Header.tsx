@@ -11,7 +11,7 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-1">
           <span>{formatMastheadDate(date)}</span>
           <div className="flex items-center gap-4">
-            <div className="hidden text-neutral-900 md:block [&_button]:text-white [&_input]:py-0.5 [&_input]:text-xs">
+            <div className="hidden text-black md:block [&_button]:text-white [&_input]:py-0.5 [&_input]:text-xs">
               <SearchBox />
             </div>
             <span>Calabria - Italia</span>
@@ -20,7 +20,7 @@ export function Header({ date = new Date() }: { date?: Date } = {}) {
       </div>
 
       <div className="mx-auto max-w-6xl px-4 pt-4 text-center">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-neutral-900">Blog dalla Calabria</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-black">Blog dalla Calabria</p>
         <Link href="/" className="mt-1 inline-block">
           <Image
             src="/logo-malalingua-blog.jpg"

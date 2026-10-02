@@ -21,7 +21,7 @@ export function Hero({ article }: { article: ArticleSummary }) {
       <div className="mt-4">
         <CategoryBadge name={article.category.name} accentColor={article.category.accentColor} />
         <h1 className="mt-3 font-display text-3xl font-bold leading-tight md:text-4xl">{article.title}</h1>
-        <time className="mt-2 block text-sm text-neutral-800" dateTime={article.publishedAt}>
+        <time className="mt-2 block text-sm text-neutral-900" dateTime={article.publishedAt}>
           {formatDate(article.publishedAt)}
         </time>
       </div>

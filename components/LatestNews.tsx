@@ -21,11 +21,11 @@ export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
                   <CoverImage image={article.coverImage} alt={article.title} width={320} sizes="128px" />
                 </div>
               )}
-              <div className="hidden w-20 shrink-0 pt-1 text-xs font-semibold text-neutral-800 sm:block">
+              <div className="hidden w-20 shrink-0 pt-1 text-xs font-semibold text-neutral-900 sm:block">
                 <time dateTime={article.publishedAt}>{formatNewsTimestamp(article.publishedAt)}</time>
               </div>
               <div className="min-w-0 flex-1">
-                <time dateTime={article.publishedAt} className="block text-xs font-semibold text-neutral-800 sm:hidden">
+                <time dateTime={article.publishedAt} className="block text-xs font-semibold text-neutral-900 sm:hidden">
                   {formatNewsTimestamp(article.publishedAt)}
                 </time>
                 {article.category && (
@@ -33,7 +33,7 @@ export function LatestNews({ articles }: { articles: ArticleSummary[] }) {
                 )}
                 <ArticleTitle title={article.title} className="text-lg group-hover:underline" />
                 {article.excerpt && (
-                  <p className="mt-1 font-display text-sm text-neutral-900 line-clamp-2">{article.excerpt}</p>
+                  <p className="mt-1 font-display text-sm text-black line-clamp-2">{article.excerpt}</p>
                 )}
               </div>
             </Link>

@@ -41,7 +41,7 @@ export default async function CategoryPage({
     <main className="mx-auto max-w-6xl px-6 py-8">
       <h1 className="mb-6 font-display text-3xl font-bold">{category.name}</h1>
       {articles.length === 0 ? (
-        <p className="text-neutral-800">Nessun articolo trovato.</p>
+        <p className="text-neutral-900">Nessun articolo trovato.</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (

@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Slightly heavier regular text so it reads darker (Inter and Fraunces are variable fonts). */
+body {
+  font-weight: 450;
+}
+
 /* "Malalingua ora": headlines scroll right to left, pause while hovered or focused. */
 @keyframes ticker-scroll {
   from {

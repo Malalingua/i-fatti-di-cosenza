@@ -62,7 +62,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
       />
       <CategoryBadge name={article.category.name} accentColor={article.category.accentColor} />
       <h1 className="mt-4 font-display text-4xl font-bold leading-tight">{article.title}</h1>
-      <p className="mt-2 text-sm text-neutral-800">
+      <p className="mt-2 text-sm text-neutral-900">
         {article.author.name} · <time dateTime={article.publishedAt}>{formatDate(article.publishedAt)}</time>
       </p>
       <div className="mt-6 overflow-hidden rounded-xl">

@@ -8,7 +8,7 @@ export function splitTitle(title: string): [string, string] {
 export function ArticleTitle({ title, className = '' }: { title: string; className?: string }) {
   const [lead, rest] = splitTitle(title)
   return (
-    <h3 className={`font-display font-bold leading-tight text-neutral-900 ${className}`}>
+    <h3 className={`font-display font-bold leading-tight text-black ${className}`}>
       {lead && <span className="text-[#d42a1c]">{lead}</span>}
       {rest}
     </h3>
