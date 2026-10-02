@@ -34,7 +34,7 @@ export function RaccoltaIndifferenziata({ articles }: { articles: (ArticleSummar
               </div>
             )}
             <ArticleTitle title={article.title} className="mt-3 text-xl" />
-            {article.excerpt && <p className="mt-1 font-display text-sm text-neutral-700 line-clamp-3">{article.excerpt}</p>}
+            {article.excerpt && <p className="mt-1 font-display text-sm text-neutral-900 line-clamp-3">{article.excerpt}</p>}
           </Link>
         ))}
       </div>

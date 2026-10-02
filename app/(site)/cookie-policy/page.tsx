@@ -11,9 +11,9 @@ export const metadata: Metadata = pageMetadata({
 
 export default function CookiePolicyPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-8 leading-relaxed text-neutral-800">
+    <main className="mx-auto max-w-3xl px-6 py-8 leading-relaxed text-neutral-900">
       <h1 className="font-display text-4xl font-bold">Cookie policy</h1>
-      <p className="mt-2 text-sm text-neutral-500">Ultimo aggiornamento: 2 ottobre 2026</p>
+      <p className="mt-2 text-sm text-neutral-800">Ultimo aggiornamento: 2 ottobre 2026</p>
 
       <h2 className="mt-8 font-display text-2xl font-bold">Chi gestisce il sito</h2>
       <p className="mt-2">

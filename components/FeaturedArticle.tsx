@@ -29,7 +29,7 @@ export function FeaturedArticle({ article, title }: FeaturedArticleProps) {
         )}
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/75 to-transparent px-5 pb-5 pt-24 text-white">
           <h2 className="font-display text-2xl font-bold leading-tight md:text-3xl">{article.title}</h2>
-          {article.excerpt && <p className="mt-2 font-display text-base leading-snug text-white/90">{article.excerpt}</p>}
+          {article.excerpt && <p className="mt-2 font-display text-base leading-snug text-white">{article.excerpt}</p>}
         </div>
       </Link>
     </section>

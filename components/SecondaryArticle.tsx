@@ -41,7 +41,7 @@ export function SecondaryArticle({ article, title, color, layout = 'stacked' }: 
         <div className="flex-1">
           <ArticleTitle title={article.title} className={side ? 'text-2xl' : 'text-xl'} />
           {article.excerpt && (
-            <p className="mt-2 font-display text-sm leading-snug text-neutral-700 line-clamp-4">{article.excerpt}</p>
+            <p className="mt-2 font-display text-sm leading-snug text-neutral-900 line-clamp-4">{article.excerpt}</p>
           )}
         </div>
       </Link>

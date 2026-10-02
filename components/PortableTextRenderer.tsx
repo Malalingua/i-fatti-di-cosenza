@@ -5,7 +5,7 @@ import { SanityImage } from './SanityImage'
 
 export function PortableTextRenderer({ value }: { value: PortableTextBlock[] }) {
   return (
-    <div className="prose prose-neutral max-w-none">
+    <div className="prose prose-neutral max-w-none [--tw-prose-body:theme(colors.neutral.900)] [--tw-prose-bullets:theme(colors.neutral.700)]">
       <PortableText
         value={value}
         components={{
@@ -41,7 +41,7 @@ export function PortableTextRenderer({ value }: { value: PortableTextBlock[] }) 
                 <figure>
                   <video controls className="w-full rounded-lg" src={src} />
                   {videoValue.caption && (
-                    <figcaption className="mt-2 text-sm text-neutral-500">{videoValue.caption}</figcaption>
+                    <figcaption className="mt-2 text-sm text-neutral-800">{videoValue.caption}</figcaption>
                   )}
                 </figure>
               )

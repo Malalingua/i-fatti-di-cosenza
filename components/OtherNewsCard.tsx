@@ -11,7 +11,7 @@ export function OtherNewsCard({ article }: { article: ArticleSummary }) {
         {article.category.name}
       </span>
       <h3 className="mt-1 font-display text-xl font-bold leading-snug group-hover:underline">{article.title}</h3>
-      {article.excerpt && <p className="mt-2 text-sm text-neutral-600">{article.excerpt}</p>}
+      {article.excerpt && <p className="mt-2 text-sm text-neutral-900">{article.excerpt}</p>}
     </Link>
   )
 }

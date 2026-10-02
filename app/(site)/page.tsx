@@ -53,7 +53,7 @@ export default async function HomePage() {
   if (!layout) {
     return (
       <main className="mx-auto max-w-6xl px-4 py-8">
-        <p className="text-neutral-500">Nessun articolo pubblicato.</p>
+        <p className="text-neutral-800">Nessun articolo pubblicato.</p>
       </main>
     )
   }

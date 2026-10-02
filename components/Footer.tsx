@@ -4,7 +4,7 @@ import { ABOUT_TEXT, CATEGORIES, JOURNALIST_EMAIL, MASTHEAD } from '@/lib/consta
 
 export function Footer() {
   return (
-    <footer className="mt-8 bg-neutral-950 text-sm text-neutral-300">
+    <footer className="mt-8 bg-neutral-950 text-sm text-neutral-200">
       <div className="mx-auto max-w-6xl px-4 py-8">
         <p className="font-display text-3xl font-bold text-white">
           Mala<span className="text-[#d42a1c]">lingua</span>
@@ -49,7 +49,7 @@ export function Footer() {
           </Link>
           <CookiePreferencesLink className="hover:text-white" />
         </nav>
-        <p className="mt-4 text-xs text-neutral-500">© {new Date().getFullYear()} Malalingua</p>
+        <p className="mt-4 text-xs text-neutral-400">© {new Date().getFullYear()} Malalingua</p>
       </div>
     </footer>
   )
