@@ -1,23 +1,38 @@
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getArticleBySlug, getCategoryArticles } from '@/lib/sanity/queries'
-import { hasImageAsset, urlForImage } from '@/lib/sanity/image'
+import { hasImageAsset } from '@/lib/sanity/image'
 import { formatDate } from '@/lib/utils/date'
 import { CategoryBadge } from '@/components/CategoryBadge'
 import { ArticleCard } from '@/components/ArticleCard'
 import { PortableTextRenderer } from '@/components/PortableTextRenderer'
 import { SanityImage } from '@/components/SanityImage'
+import { baseOpenGraph, shareDescription, shareImage, SITE_NAME, SITE_URL } from '@/lib/seo'
 
 export const revalidate = 60
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
   const article = await getArticleBySlug(params.slug)
   if (!article) return {}
-  const imageUrl = hasImageAsset(article.coverImage) ? urlForImage(article.coverImage).width(1200).height(630).url() : undefined
+  const description = shareDescription(article.excerpt, article.body)
+  const image = shareImage(article.coverImage, article.title)
+  const path = `/articolo/${article.slug}`
   return {
     title: article.title,
-    description: article.excerpt ?? undefined,
-    openGraph: { title: article.title, description: article.excerpt ?? undefined, images: imageUrl ? [imageUrl] : [] },
+    description,
+    alternates: { canonical: path },
+    openGraph: {
+      ...baseOpenGraph,
+      type: 'article',
+      title: article.title,
+      description,
+      url: path,
+      images: [image],
+      publishedTime: article.publishedAt,
+      authors: article.author?.name ? [article.author.name] : undefined,
+      section: article.category?.name,
+    },
+    twitter: { card: 'summary_large_image', title: article.title, description, images: [image.url] },
   }
 }
 
@@ -31,9 +46,12 @@ export default async function ArticlePage({ params }: { params: { slug: string }
     '@context': 'https://schema.org',
     '@type': 'NewsArticle',
     headline: article.title,
-    image: hasImageAsset(article.coverImage) ? [urlForImage(article.coverImage).width(1200).height(630).url()] : [],
+    description: shareDescription(article.excerpt, article.body),
+    image: hasImageAsset(article.coverImage) ? [shareImage(article.coverImage, article.title).url] : [],
     datePublished: article.publishedAt,
+    mainEntityOfPage: `${SITE_URL}/articolo/${article.slug}`,
     author: [{ '@type': 'Person', name: article.author.name }],
+    publisher: { '@type': 'Organization', name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${SITE_URL}/logo-malalingua-blog.jpg` } },
   }
 
   return (

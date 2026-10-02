@@ -3,6 +3,7 @@ import { searchArticles } from '@/lib/sanity/queries'
 import { ArticleCard } from '@/components/ArticleCard'
 
 export const metadata: Metadata = {
+  title: 'Cerca',
   robots: { index: false, follow: true },
 }
 

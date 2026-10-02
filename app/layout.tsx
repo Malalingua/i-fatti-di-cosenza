@@ -1,14 +1,17 @@
 import type { Metadata } from 'next'
 import { Fraunces, Inter } from 'next/font/google'
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL, baseOpenGraph, DEFAULT_OG_IMAGE } from '@/lib/seo'
 import './globals.css'
 
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces' })
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
-  title: { default: 'Malalingua', template: '%s | Malalingua' },
-  description: 'Blog satirico dalla Calabria: interviste, poltrone, tribunali e tribolazioni.',
+  metadataBase: new URL(SITE_URL),
+  title: { default: SITE_TITLE, template: `%s | ${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  openGraph: { ...baseOpenGraph, title: SITE_TITLE, description: SITE_DESCRIPTION, url: '/' },
+  twitter: { card: 'summary_large_image', images: [DEFAULT_OG_IMAGE.url] },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

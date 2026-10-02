@@ -18,6 +18,7 @@ import { Ticker } from '@/components/Ticker'
 import { LatestNews } from '@/components/LatestNews'
 import type { SectionColor } from '@/components/SectionBar'
 import { LEAD_SECTION_TITLE } from '@/lib/constants'
+import { SITE_DESCRIPTION, pageMetadata } from '@/lib/seo'
 import {
   buildLatestFeed,
   replacementsOverTime,
@@ -28,6 +29,8 @@ import {
 import type { ArticleSummary } from '@/lib/sanity/types'
 
 export const revalidate = 60
+
+export const metadata = pageMetadata({ description: SITE_DESCRIPTION, path: '/' })
 
 const BOXES: { slug: string; title: string; color: SectionColor; layout: 'stacked' | 'side' }[] = [
   { slug: 'come-campiamo', title: 'Come campiamo', color: 'green', layout: 'stacked' },

@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { getAllCategories, getCategoryArticles } from '@/lib/sanity/queries'
 import { ArticleCard } from '@/components/ArticleCard'
+import { pageMetadata } from '@/lib/seo'
 
 export const revalidate = 60
 const PAGE_SIZE = 12
@@ -15,7 +16,11 @@ export async function generateMetadata({ params }: { params: { category: string 
   const categories = await getAllCategories()
   const category = categories.find((item) => item.slug === params.category)
   if (!category) return {}
-  return { title: category.name, description: `${category.name}: satira dalla Calabria su Malalingua.` }
+  return pageMetadata({
+    title: category.name,
+    description: `${category.name}: satira dalla Calabria su Malalingua.`,
+    path: `/${category.slug}`,
+  })
 }
 
 export default async function CategoryPage({

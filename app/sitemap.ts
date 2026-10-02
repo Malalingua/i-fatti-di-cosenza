@@ -1,11 +1,12 @@
 import type { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/seo'
 import { client } from '@/lib/sanity/client'
 import { articleSlugsQuery, getAllCategories } from '@/lib/sanity/queries'
 
 export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+  const siteUrl = SITE_URL
   const categories = await getAllCategories()
   const articleSlugs: { slug: string; publishedAt: string }[] = await client.fetch(articleSlugsQuery)
 
