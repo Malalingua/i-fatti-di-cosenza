@@ -85,7 +85,7 @@ export default async function HomePage() {
     return article ? [{ article, removedAt: replacement.removedAt }] : []
   })
   const olderNews = buildLatestFeed(removed, latest, shownArticles(layout), FEED_RESET, 20)
-  const tickerArticle = latest[0]
+  const tickerArticles = latest.slice(0, 10)
 
   // Two aligned rows, as in the template: lead | Come campiamo + Poltrone,
   // then Carta canta | Tribunali. Boxes in a row share its height, so there
@@ -113,7 +113,7 @@ export default async function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-4">
-      {tickerArticle && <Ticker article={tickerArticle} />}
+      <Ticker articles={tickerArticles} />
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className={hasTopPair ? '' : 'lg:col-span-2'}>
