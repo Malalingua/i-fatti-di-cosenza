@@ -1,4 +1,4 @@
-export const JOURNALIST_EMAIL = 'malalingua@libero.it'
+export const JOURNALIST_EMAIL = 'malalinguanonlecca@libero.it'
 
 export const CATEGORIES = [
   { name: "Nessuno l'ha mai chiesto", slug: 'nessuno-l-ha-mai-chiesto' },

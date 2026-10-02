@@ -26,7 +26,7 @@ describe('Header', () => {
     render(<Header />)
     expect(screen.getByRole('link', { name: "Invia un'email" })).toHaveAttribute(
       'href',
-      'mailto:malalingua@libero.it'
+      'mailto:malalinguanonlecca@libero.it'
     )
   })
 
