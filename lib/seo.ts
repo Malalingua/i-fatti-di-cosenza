@@ -4,7 +4,7 @@ import type { SanityImageSource } from '@sanity/image-url/lib/types/types'
 import { hasImageAsset, urlForImage } from './sanity/image'
 import { truncateExcerpt } from './utils/excerpt'
 
-const PRODUCTION_URL = 'https://malalingua.vercel.app'
+const PRODUCTION_URL = 'https://malalingua.blog'
 
 // Public address of the site, used for links shared on social networks.
 // Production always uses the real domain, so a stale env var cannot leak an old one.
