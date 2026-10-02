@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { CookiePreferencesLink } from './CookieConsent'
 import { ABOUT_TEXT, CATEGORIES, JOURNALIST_EMAIL, MASTHEAD } from '@/lib/constants'
 
 export function Footer() {
@@ -43,6 +44,10 @@ export function Footer() {
           <a href={`mailto:${JOURNALIST_EMAIL}`} className="hover:text-white">
             Invia un&apos;email
           </a>
+          <Link href="/cookie-policy" className="hover:text-white">
+            Cookie policy
+          </Link>
+          <CookiePreferencesLink className="hover:text-white" />
         </nav>
         <p className="mt-4 text-xs text-neutral-500">© {new Date().getFullYear()} Malalingua</p>
       </div>
